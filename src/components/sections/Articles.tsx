@@ -40,11 +40,8 @@ export default function Articles() {
                   sizes="(min-width: 1024px) 400px, (min-width: 768px) 50vw, 100vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:group-hover:scale-100"
                 />
-                <span className="absolute top-4 start-4 rounded-full bg-creamy-50/95 px-3.5 py-1.5 font-serif text-[13px] font-bold text-brown-500">
-                  {article.category}
-                </span>
                 <span
-                  className={`absolute top-4 end-4 rounded-full px-3.5 py-1.5 font-serif text-[13px] font-bold ${
+                  className={`absolute top-4 start-4 rounded-full px-3.5 py-1.5 font-serif text-[13px] font-bold ${
                     article.access === "members"
                       ? "bg-brown-500/95 text-creamy-50"
                       : "bg-red-50/95 text-red-800"
@@ -60,6 +57,9 @@ export default function Articles() {
                   <span aria-hidden="true">·</span>
                   <span>{t("readingTime", { minutes: article.minutes })}</span>
                 </p>
+                <span className="w-fit rounded-full bg-brown-500/10 px-3.5 py-1 font-serif text-[13px] font-bold text-brown-500">
+                  {article.category}
+                </span>
                 <h3 className="font-serif text-xl font-bold leading-[1.5] text-brown-900 transition-colors group-hover:text-brown-500">
                   <Link href="/articles">{article.title}</Link>
                 </h3>

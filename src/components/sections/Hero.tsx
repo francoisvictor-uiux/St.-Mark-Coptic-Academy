@@ -77,17 +77,17 @@ export default function Hero() {
       <div
         data-hero-pattern
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-[38%] h-[430px] opacity-[0.05] [background-image:url('/Cross.svg')] [background-size:54px_54px] [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)]"
+        className="pointer-events-none absolute inset-x-0 top-[38%] h-[430px] opacity-[0.05] [background-image:url('/Pattern.svg')] [background-size:374px_212px] [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)]"
       />
 
       {/* Content */}
       <div className="relative z-10 mx-auto flex w-full max-w-[820px] flex-col items-center gap-8 px-4 text-center md:gap-10">
         <div className="flex flex-col items-center gap-8 md:gap-10">
           <div data-hero-eyebrow className="flex items-center justify-center gap-2">
+            <CopticCross className="size-5 text-brown-500" />
             <p className="font-serif text-[15px] text-brown-500 [font-feature-settings:'swsh'_1] md:text-lg">
               {t("eyebrow")}
             </p>
-            <CopticCross className="size-5 text-brown-500" />
           </div>
 
           <h1

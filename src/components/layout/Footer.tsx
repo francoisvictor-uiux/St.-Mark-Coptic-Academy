@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import CopticCross from "@/components/ui/CopticCross";
+import LogoMark from "@/components/ui/LogoMark";
 
 const QUICK_LINKS = [
   { key: "home", href: "#top" },
@@ -21,7 +21,7 @@ export default function Footer() {
         <div className="grid gap-12 lg:grid-cols-2 lg:items-end lg:gap-16">
           {/* Identity + links */}
           <div className="flex flex-col gap-8">
-            <CopticCross className="size-[72px] text-creamy-100 md:size-[100px]" />
+            <LogoMark className="size-[72px] text-creamy-100 md:size-[100px]" />
 
             <div className="flex flex-col gap-1 font-serif text-[16px] leading-relaxed">
               <p>{t("address")}</p>

@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import CopticCross from "@/components/ui/CopticCross";
+import LogoMark from "@/components/ui/LogoMark";
 import PillButton from "@/components/ui/PillButton";
 
 type ComingSoonProps = {
@@ -13,7 +13,7 @@ export default function ComingSoon({ title }: ComingSoonProps) {
   return (
     <main className="flex min-h-svh flex-col items-center justify-center gap-8 bg-creamy-100 px-4 py-24 text-center">
       <span className="flex size-[90px] items-center justify-center rounded-full bg-red-500">
-        <CopticCross className="size-11 text-creamy-100" />
+        <LogoMark className="size-11 text-creamy-100" />
       </span>
       <div className="flex flex-col gap-3">
         <p className="font-serif text-lg text-red-500">{t("comingSoonTitle")}</p>

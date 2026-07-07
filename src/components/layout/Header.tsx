@@ -139,24 +139,16 @@ export default function Header() {
           {/* Auth */}
           <Link
             href="/login"
-            className="hidden font-serif text-[16px] text-brown-400 transition-colors hover:text-brown-500 xl:block"
+            className="hidden h-10 items-center rounded-full border border-brown-500 px-4 font-serif text-[15px] font-bold text-brown-500 transition-colors hover:bg-brown-500/5 md:flex"
           >
             {t("login")}
           </Link>
           <Link
             href="/register"
-            className="hidden h-10 items-center rounded-full border border-brown-500 px-4 font-serif text-[15px] font-bold text-brown-500 transition-colors hover:bg-brown-500/5 xl:flex"
+            className="hidden h-10 items-center rounded-full bg-brown-500 px-5 font-serif text-[15px] font-bold text-creamy-50 transition-colors hover:bg-brown-600 md:flex"
           >
             {t("register")}
           </Link>
-
-          {/* Apply CTA */}
-          <a
-            href="#apply"
-            className="hidden h-10 items-center rounded-full bg-brown-500 px-5 font-serif text-[15px] font-bold text-creamy-50 transition-colors hover:bg-brown-600 md:flex"
-          >
-            {t("apply")}
-          </a>
 
           {/* Mobile menu button */}
           <button
@@ -195,30 +187,21 @@ export default function Header() {
                 {t(item.key)}
               </a>
             ))}
-            <div className="mt-3 flex flex-col gap-2 border-t border-line/60 pt-4">
-              <a
-                href="#apply"
+            <div className="mt-3 flex gap-2 border-t border-line/60 pt-4">
+              <Link
+                href="/login"
                 onClick={closeMenu}
-                className="flex h-12 items-center justify-center rounded-full bg-brown-500 font-serif font-bold text-creamy-50"
+                className="flex h-12 flex-1 items-center justify-center rounded-full border border-brown-500 font-serif font-bold text-brown-500"
               >
-                {t("apply")}
-              </a>
-              <div className="flex gap-2">
-                <Link
-                  href="/login"
-                  onClick={closeMenu}
-                  className="flex h-12 flex-1 items-center justify-center rounded-full border border-line font-serif text-brown-500"
-                >
-                  {t("login")}
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={closeMenu}
-                  className="flex h-12 flex-1 items-center justify-center rounded-full border border-brown-500 font-serif font-bold text-brown-500"
-                >
-                  {t("register")}
-                </Link>
-              </div>
+                {t("login")}
+              </Link>
+              <Link
+                href="/register"
+                onClick={closeMenu}
+                className="flex h-12 flex-1 items-center justify-center rounded-full bg-brown-500 font-serif font-bold text-creamy-50"
+              >
+                {t("register")}
+              </Link>
             </div>
           </nav>
         </div>

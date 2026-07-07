@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import CopticCross from "@/components/ui/CopticCross";
+import LogoMark from "@/components/ui/LogoMark";
 import PillButton from "@/components/ui/PillButton";
 
 type AuthCardProps = {
@@ -24,7 +24,7 @@ export default function AuthCard({ mode }: AuthCardProps) {
       <div className="w-full max-w-md rounded-card border border-line bg-card p-8 md:p-10">
         <div className="mb-8 flex flex-col items-center gap-4 text-center">
           <span className="flex size-16 items-center justify-center rounded-full bg-red-500">
-            <CopticCross className="size-8 text-creamy-100" />
+            <LogoMark className="size-8 text-creamy-100" />
           </span>
           <div>
             <h1 className="font-serif text-2xl font-bold text-brown-900">

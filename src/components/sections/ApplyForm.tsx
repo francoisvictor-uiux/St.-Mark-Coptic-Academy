@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import SectionHeader from "@/components/ui/SectionHeader";
-import CopticCross from "@/components/ui/CopticCross";
+import LogoMark from "@/components/ui/LogoMark";
 import PillButton from "@/components/ui/PillButton";
 import Reveal from "@/components/ui/Reveal";
 
@@ -104,7 +104,7 @@ export default function ApplyForm() {
             {status === "success" ? (
               <div className="flex flex-col items-center gap-6 py-10 text-center">
                 <span className="flex size-[90px] items-center justify-center rounded-full bg-red-500">
-                  <CopticCross className="size-11 text-creamy-100" />
+                  <LogoMark className="size-11 text-creamy-100" />
                 </span>
                 <h3 className="font-serif text-2xl font-bold text-brown-900 md:text-3xl">
                   {t("successTitle")}

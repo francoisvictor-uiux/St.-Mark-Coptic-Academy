@@ -7,16 +7,16 @@ type SectionHeaderProps = {
 
 /**
  * Universal section header from the Figma design language:
- * centered red label + 24px Coptic cross, optional muted subtitle below.
+ * centered brand-brown label + 24px logo emblem, optional muted subtitle below.
  */
 export default function SectionHeader({ label, subtitle }: SectionHeaderProps) {
   return (
     <div className="flex flex-col items-center gap-4 text-center">
       <div className="flex items-center gap-2" data-reveal>
-        <h2 className="font-serif text-[26px] leading-tight text-red-500 md:text-[32px]">
+        <CopticCross className="size-6 shrink-0 text-brown-500" />
+        <h2 className="font-serif text-[26px] leading-tight text-brown-500 md:text-[32px]">
           {label}
         </h2>
-        <CopticCross className="size-6 shrink-0 text-red-500" />
       </div>
       {subtitle ? (
         <p

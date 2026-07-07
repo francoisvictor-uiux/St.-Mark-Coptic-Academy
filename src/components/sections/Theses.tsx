@@ -23,7 +23,7 @@ export default function Theses() {
       <div className="mx-auto max-w-[1440px] px-4 md:px-8">
         {/* Dark editorial band, echoing the vision card surface */}
         <Reveal className="rounded-card bg-brown-500 px-6 py-14 md:px-14 md:py-20">
-          <div className="mx-auto flex max-w-[1248px] flex-col gap-10 md:gap-14 [&_h2]:text-red-300 [&_p]:text-creamy-100/70">
+          <div className="mx-auto flex max-w-[1248px] flex-col gap-10 md:gap-14 [&_h2]:text-creamy-100 [&_svg]:text-creamy-100 [&_p]:text-creamy-100/70">
             <SectionHeader label={t("label")} subtitle={t("subtitle")} />
           </div>
 
@@ -57,11 +57,10 @@ export default function Theses() {
             ))}
           </div>
 
-          <div className="mt-10 flex flex-col items-center gap-3 md:mt-14" data-reveal>
+          <div className="mt-10 flex justify-center md:mt-14" data-reveal>
             <PillButton href="/theses" variant="light" withArrow>
               {t("showAll")}
             </PillButton>
-            <p className="font-serif text-sm font-light text-creamy-100/60">{t("showAllHint")}</p>
           </div>
         </Reveal>
       </div>

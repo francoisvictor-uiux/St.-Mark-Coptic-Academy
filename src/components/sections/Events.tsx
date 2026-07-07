@@ -5,7 +5,7 @@ import { useTranslations, useMessages } from "next-intl";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import SectionHeader from "@/components/ui/SectionHeader";
-import CopticCross from "@/components/ui/CopticCross";
+import LogoMark from "@/components/ui/LogoMark";
 import Reveal from "@/components/ui/Reveal";
 
 type EventItem = {
@@ -80,7 +80,7 @@ export default function Events() {
         <div ref={listRef} className="flex flex-col" data-reveal>
           {visible.length === 0 ? (
             <div className="flex flex-col items-center gap-4 rounded-card border border-dashed border-line py-16 text-center">
-              <CopticCross className="size-10 text-brown-100" />
+              <LogoMark className="size-10 text-brown-100" />
               <p className="max-w-md font-serif text-lg font-light text-brown-400">{t("emptyState")}</p>
             </div>
           ) : (

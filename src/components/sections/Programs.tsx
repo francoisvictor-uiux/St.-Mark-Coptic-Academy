@@ -35,50 +35,58 @@ export default function Programs() {
 
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
           {programs.map((program) => (
-            <article
-              key={program.id}
-              data-reveal
-              className="group flex flex-col overflow-hidden rounded-card border border-line bg-card transition-all duration-300 hover:-translate-y-1.5 hover:border-brown-200 motion-reduce:hover:translate-y-0"
-            >
-              <div className="relative h-44 overflow-hidden">
+            <article key={program.id} data-reveal className="group h-[430px]">
+              <Link
+                href="/programs"
+                aria-label={`${t("cardCta")}: ${program.title}`}
+                className="relative block h-full overflow-hidden rounded-card shadow-[0_0_40px_-18px_rgba(86,40,35,0.45)] transition-all duration-500 ease-in-out group-hover:scale-[1.03] group-hover:shadow-[0_0_60px_-15px_rgba(86,40,35,0.65)] motion-reduce:group-hover:scale-100"
+              >
+                {/* Full-bleed image with parallax zoom */}
                 <Image
                   src={program.image}
                   alt=""
                   fill
                   sizes="(min-width: 1280px) 300px, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:group-hover:scale-100"
+                  className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-110 motion-reduce:group-hover:scale-100"
                 />
+
+                {/* Brand gradient overlay */}
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-[linear-gradient(to_top,rgba(56,25,21,0.94),rgba(86,40,35,0.62)_38%,rgba(86,40,35,0.12)_68%,transparent_82%)]"
+                />
+
                 <span
                   className={`absolute top-4 start-4 rounded-full px-3.5 py-1.5 font-serif text-[13px] font-bold ${STATUS_STYLES[program.status]}`}
                 >
                   {t(`status.${program.status}`)}
                 </span>
-              </div>
 
-              <div className="flex flex-1 flex-col gap-3 p-6">
-                <h3 className="font-serif text-xl font-bold leading-snug text-brown-900">
-                  {program.title}
-                </h3>
-                <p className="flex-1 font-serif text-[15px] font-light leading-[1.7] text-brown-400">
-                  {program.description}
-                </p>
-                <p className="flex items-center gap-2 font-serif text-sm text-brown-300">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-4" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M12 7v5l3 3" />
-                  </svg>
-                  <span>
-                    {t("duration")}: {program.duration}
-                  </span>
-                </p>
-                <Link
-                  href="/programs"
-                  className="mt-2 inline-flex items-center gap-2 font-serif text-[15px] font-bold text-brown-500 transition-colors hover:text-red-600"
-                >
-                  {t("cardCta")}
-                  <ArrowIcon className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:rtl:-translate-x-0.5" />
-                </Link>
-              </div>
+                {/* Content over the image */}
+                <div className="relative flex h-full flex-col justify-end gap-2.5 p-6 text-creamy-50">
+                  <h3 className="font-serif text-xl font-bold leading-snug">
+                    {program.title}
+                  </h3>
+                  <p className="font-serif text-[14.5px] font-light leading-[1.7] text-creamy-100/85">
+                    {program.description}
+                  </p>
+                  <p className="flex items-center gap-2 font-serif text-sm text-creamy-100/70">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-4" aria-hidden="true">
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 7v5l3 3" />
+                    </svg>
+                    <span>
+                      {t("duration")}: {program.duration}
+                    </span>
+                  </p>
+
+                  {/* Glass CTA bar */}
+                  <div className="mt-3 flex items-center justify-between rounded-full border border-creamy-100/25 bg-creamy-100/10 px-5 py-3 font-serif text-[15px] font-bold backdrop-blur-md transition-all duration-300 group-hover:border-creamy-100/45 group-hover:bg-creamy-100/20">
+                    <span>{t("cardCta")}</span>
+                    <ArrowIcon className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:rtl:-translate-x-0.5" />
+                  </div>
+                </div>
+              </Link>
             </article>
           ))}
         </div>

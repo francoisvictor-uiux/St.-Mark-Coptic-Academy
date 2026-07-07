@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { useTranslations, useMessages } from "next-intl";
 import SectionHeader from "@/components/ui/SectionHeader";
-import CopticCross from "@/components/ui/CopticCross";
 import Reveal from "@/components/ui/Reveal";
 import StatCounter from "@/components/ui/StatCounter";
 
@@ -37,7 +36,13 @@ export default function Vision() {
               <div className="relative flex h-[120px] w-[150px] items-end md:h-[140px] md:w-[170px]">
                 <div className="flex h-full w-full items-center justify-center rounded-tr-card bg-creamy-100">
                   <div className="flex size-[90px] items-center justify-center rounded-full bg-red-500 md:size-[110px]">
-                    <CopticCross className="size-[42px] text-creamy-100 md:size-[51px]" />
+                    <Image
+                      src="/Logo.svg"
+                      alt=""
+                      width={51}
+                      height={51}
+                      className="size-[42px] md:size-[51px]"
+                    />
                   </div>
                 </div>
                 {/* concave corner pieces */}
