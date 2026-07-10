@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import gsap from "gsap";
@@ -18,6 +18,38 @@ const NAV_ITEMS = [
   { key: "events", href: "#events" },
   { key: "faq", href: "#faq" },
 ] as const;
+
+// A link to a home-page section. On the home page it's a native in-page anchor
+// (smooth scroll); anywhere else it routes to the home page then scrolls to the
+// section, keeping the header wired to the home content across every route.
+function SectionLink({
+  href,
+  isHome,
+  className,
+  onClick,
+  children,
+  ...rest
+}: {
+  href: string;
+  isHome: boolean;
+  className: string;
+  onClick?: () => void;
+  children: ReactNode;
+  "aria-label"?: string;
+}) {
+  if (isHome) {
+    return (
+      <a href={href} className={className} onClick={onClick} {...rest}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link href={`/${href}`} className={className} onClick={onClick} {...rest}>
+      {children}
+    </Link>
+  );
+}
 
 export default function Header() {
   const t = useTranslations("nav");
@@ -64,6 +96,11 @@ export default function Header() {
 
   const closeMenu = () => setMenuOpen(false);
 
+  // On the home page the logo/nav are in-page anchors (native smooth scroll).
+  // On every other page they route back to the home page and then scroll to
+  // the section, so the header stays wired together across the whole site.
+  const isHome = pathname === "/";
+
   return (
     <header
       ref={headerRef}
@@ -71,20 +108,21 @@ export default function Header() {
     >
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between gap-4 px-4 md:h-[84px] md:px-8">
         {/* Logo */}
-        <a href="#top" className="flex shrink-0 items-center gap-3" aria-label={t("home")}>
+        <SectionLink href="#top" isHome={isHome} className="flex shrink-0 items-center gap-3" aria-label={t("home")}>
           <Image src="/Logo.svg" alt="" width={48} height={48} className="size-10 md:size-12" priority />
-        </a>
+        </SectionLink>
 
         {/* Desktop nav */}
         <nav aria-label="Main" className="hidden items-center gap-7 lg:flex">
           {NAV_ITEMS.map((item) => (
-            <a
+            <SectionLink
               key={item.key}
               href={item.href}
+              isHome={isHome}
               className="font-serif text-[16px] text-brown-400 transition-colors hover:text-brown-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brown-500"
             >
               {t(item.key)}
-            </a>
+            </SectionLink>
           ))}
         </nav>
 
@@ -178,14 +216,15 @@ export default function Header() {
         >
           <nav aria-label="Mobile" className="flex flex-col gap-1 px-4 py-4">
             {NAV_ITEMS.map((item) => (
-              <a
+              <SectionLink
                 key={item.key}
                 href={item.href}
+                isHome={isHome}
                 onClick={closeMenu}
                 className="rounded-2xl px-4 py-3 font-serif text-lg text-brown-500 transition-colors hover:bg-brown-500/5"
               >
                 {t(item.key)}
-              </a>
+              </SectionLink>
             ))}
             <div className="mt-3 flex gap-2 border-t border-line/60 pt-4">
               <Link
