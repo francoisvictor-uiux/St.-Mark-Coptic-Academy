@@ -1897,5 +1897,29 @@
       "text": "Couldn't load theses — check your connection.",
       "retry": "Retry"
     }
+  },
+  "articleReader": {
+    "back": "All articles",
+    "tocTitle": "Contents",
+    "minLeft": "{minutes} min left",
+    "share": "Share",
+    "bookmark": "Save",
+    "bookmarked": "Saved",
+    "print": "Print",
+    "download": "Download PDF",
+    "linkCopied": "Link copied",
+    "aboutAuthor": "About the author",
+    "authorRole": "Contributor · St. Mark Coptic Academy",
+    "viewAuthor": "View all articles",
+    "relatedTitle": "Related articles",
+    "shareTitle": "Share this article",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "onFacebook": "Share on Facebook",
+    "onLinkedIn": "Share on LinkedIn",
+    "onWhatsApp": "Share on WhatsApp",
+    "byEmail": "Share by email",
+    "imageZoom": "View image full size",
+    "closeImage": "Close image"
   }
 }

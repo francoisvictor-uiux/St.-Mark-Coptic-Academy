@@ -1898,5 +1898,29 @@
       "text": "تعذّر تحميل الرسائل — تحقق من اتصالك.",
       "retry": "إعادة المحاولة"
     }
+  },
+  "articleReader": {
+    "back": "كل المقالات",
+    "tocTitle": "المحتويات",
+    "minLeft": "بقي {minutes} دقيقة",
+    "share": "مشاركة",
+    "bookmark": "حفظ",
+    "bookmarked": "محفوظ",
+    "print": "طباعة",
+    "download": "تحميل PDF",
+    "linkCopied": "تم نسخ الرابط",
+    "aboutAuthor": "عن الكاتب",
+    "authorRole": "كاتب · أكاديمية القديس مرقس القبطية",
+    "viewAuthor": "عرض كل المقالات",
+    "relatedTitle": "مقالات ذات صلة",
+    "shareTitle": "شارك هذا المقال",
+    "copyLink": "نسخ الرابط",
+    "copied": "تم النسخ",
+    "onFacebook": "المشاركة على فيسبوك",
+    "onLinkedIn": "المشاركة على لينكدإن",
+    "onWhatsApp": "المشاركة على واتساب",
+    "byEmail": "المشاركة عبر البريد",
+    "imageZoom": "عرض الصورة بالحجم الكامل",
+    "closeImage": "إغلاق الصورة"
   }
 }
