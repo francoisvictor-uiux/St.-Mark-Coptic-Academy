@@ -588,6 +588,11 @@
         "title": "Welcome to St. Mark Coptic Academy",
         "line": "Your account is now active, {name} — we wish you a blessed learning journey",
         "portal": "Go to the portal"
+      },
+      "pending": {
+        "title": "Registration received",
+        "line": "Thank you, {name} — your account is now awaiting the Academy's approval. We've emailed you, and once you're approved you'll receive an activation link.",
+        "login": "Go to sign in"
       }
     },
     "forgot": {
@@ -656,6 +661,17 @@
         "passwordWeak": "Password is weak — mix upper/lowercase letters, digits and symbols",
         "confirmMismatch": "Passwords do not match",
         "expired": "The invitation link is invalid or has expired (72 hours).",
+        "network": "Could not reach the server — try again"
+      }
+    },
+    "activate": {
+      "title": "Activate your account",
+      "subtitle": "Your registration was approved by the Academy. Activate your account below to sign in.",
+      "cta": "Activate account",
+      "missingToken": "The activation link is incomplete — open it from your email",
+      "goLogin": "Go to sign in",
+      "errors": {
+        "expired": "This activation link is invalid or has expired (7 days).",
         "network": "Could not reach the server — try again"
       }
     }
@@ -743,12 +759,14 @@
         "revokeInvite": "Revoke invite",
         "resetPassword": "Reset password",
         "activate": "Activate",
+        "approve": "Approve",
         "deactivate": "Deactivate",
         "delete": "Delete"
       },
       "toasts": {
         "deactivated": "{name} deactivated and signed out everywhere",
         "activated": "{name} activated",
+        "approved": "Approval email sent — {name} can now activate their account",
         "resetSent": "Reset code emailed to the user",
         "inviteResent": "Invitation resent",
         "inviteRevoked": "Invitation revoked — the old link no longer works",
@@ -773,6 +791,11 @@
           "title": "Activate account",
           "body": "{name} will be able to sign in again.",
           "cta": "Activate"
+        },
+        "approve": {
+          "title": "Approve registration",
+          "body": "We'll email {name} an activation link. Their account becomes active when they click it.",
+          "cta": "Approve & send link"
         },
         "reset": {
           "title": "Reset password",

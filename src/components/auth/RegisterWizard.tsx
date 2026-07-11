@@ -91,7 +91,7 @@ export default function RegisterWizard({ initialVerifyEmail }: RegisterWizardPro
   const locale = useLocale();
   const router = useRouter();
 
-  const [stage, setStage] = useState<"form" | "verify" | "success">(
+  const [stage, setStage] = useState<"form" | "verify" | "success" | "pending">(
     initialVerifyEmail ? "verify" : "form",
   );
   const [step, setStep] = useState(0);
@@ -241,9 +241,15 @@ export default function RegisterWizard({ initialVerifyEmail }: RegisterWizardPro
       });
       setFirstNameVerified(draft.firstNameAr.trim());
       setVerifyEmailAddr(email);
+      try {
+        sessionStorage.removeItem(DRAFT_KEY);
+      } catch {
+        /* ignore */
+      }
       setSubmitState("idle");
       setDirection(1);
-      setStage("verify");
+      // Admin-approval flow: the account is pending review, not self-verified.
+      setStage("pending");
     } catch (error) {
       setSubmitState("idle");
       if (error instanceof ApiError && error.code === "email_taken") {
@@ -257,6 +263,27 @@ export default function RegisterWizard({ initialVerifyEmail }: RegisterWizardPro
       }
       setBanner(error instanceof ApiError ? error.localized(locale) : t("errors.network"));
     }
+  }
+
+  if (stage === "pending") {
+    return (
+      <div className="flex flex-col items-center gap-6 text-center" role="status">
+        <SuccessCheck />
+        <div>
+          <h2 className="font-display text-[28px] font-bold leading-9 text-brown-900">
+            {t("pending.title")}
+          </h2>
+          <p className="mt-2 font-serif text-[17px] font-light leading-7 text-brown-400">
+            {t("pending.line", { name: firstNameVerified || "" })}
+          </p>
+        </div>
+        <div className="flex w-full flex-col gap-3">
+          <SubmitButton type="button" onClick={() => router.push("/login")}>
+            {t("pending.login")}
+          </SubmitButton>
+        </div>
+      </div>
+    );
   }
 
   if (stage === "success") {

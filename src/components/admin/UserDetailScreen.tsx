@@ -41,7 +41,7 @@ export default function UserDetailScreen({ userId }: { userId: string }) {
   const [activity, setActivity] = useState<AuditEntry[]>([]);
   const [activityNext, setActivityNext] = useState<string | null>(null);
   const [sessions, setSessions] = useState<SessionRow[] | null>(null);
-  const [confirm, setConfirm] = useState<"deactivate" | "activate" | "reset" | null>(null);
+  const [confirm, setConfirm] = useState<"deactivate" | "activate" | "approve" | "reset" | null>(null);
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -97,8 +97,17 @@ export default function UserDetailScreen({ userId }: { userId: string }) {
         await resetUserPassword(detail.id);
         toast("success", t("toasts.resetSent"));
       } else {
-        await setUserStatus(detail.id, confirm);
-        toast("success", confirm === "deactivate" ? t("toasts.deactivated") : t("toasts.activated"));
+        // "approve" uses the activate action; for a pending-approval user the
+        // backend emails the activation link instead of activating outright.
+        await setUserStatus(detail.id, confirm === "approve" ? "activate" : confirm);
+        toast(
+          "success",
+          confirm === "deactivate"
+            ? t("toasts.deactivated")
+            : confirm === "approve"
+              ? t("toasts.approved")
+              : t("toasts.activated"),
+        );
         load();
       }
     } catch (error) {
@@ -156,14 +165,26 @@ export default function UserDetailScreen({ userId }: { userId: string }) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setConfirm(detail.status === "suspended" ? "activate" : "deactivate")}
+                  onClick={() =>
+                    setConfirm(
+                      detail.status === "pending_approval"
+                        ? "approve"
+                        : detail.status === "suspended"
+                          ? "activate"
+                          : "deactivate",
+                    )
+                  }
                   className={`rounded-full px-4 py-2 text-[13px] font-bold ${
-                    detail.status === "suspended"
+                    detail.status === "suspended" || detail.status === "pending_approval"
                       ? "bg-success text-creamy-50"
                       : "border border-danger text-danger hover:bg-danger hover:text-creamy-50"
                   }`}
                 >
-                  {detail.status === "suspended" ? t("actions.activate") : t("actions.deactivate")}
+                  {detail.status === "pending_approval"
+                    ? t("actions.approve")
+                    : detail.status === "suspended"
+                      ? t("actions.activate")
+                      : t("actions.deactivate")}
                 </button>
               </>
             ) : null}

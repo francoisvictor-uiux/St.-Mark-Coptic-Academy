@@ -170,7 +170,7 @@ export type RegisterPayload = {
 };
 
 export function register(payload: RegisterPayload) {
-  return request<{ user_id: string; verification: string }>("/auth/register", {
+  return request<{ user_id: string; status: string }>("/auth/register", {
     method: "POST",
     body: JSON.stringify(payload),
   });
@@ -180,6 +180,17 @@ export async function verifyEmail(email: string, code: string) {
   const data = await request<LoginResponse>("/auth/verify-email", {
     method: "POST",
     body: JSON.stringify({ email, code }),
+  });
+  setAccessToken(data.access);
+  markSession(true);
+  return data.user;
+}
+
+/** Activate an admin-approved account via the emailed link token → logs in. */
+export async function activateAccount(token: string) {
+  const data = await request<LoginResponse>("/auth/activate", {
+    method: "POST",
+    body: JSON.stringify({ token }),
   });
   setAccessToken(data.access);
   markSession(true);
