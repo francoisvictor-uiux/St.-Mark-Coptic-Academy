@@ -43,6 +43,7 @@ export default function Vision({ data, showStats = true }: { data?: VisionData; 
   const [shown, setShown] = useState<TabKey>("vision");
 
   const root = useRef<HTMLElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
   const bg = useRef<HTMLDivElement>(null);
   const kicker = useRef<HTMLParagraphElement>(null);
   const tabsBar = useRef<HTMLDivElement>(null);
@@ -69,6 +70,22 @@ export default function Vision({ data, showStats = true }: { data?: VisionData; 
   // Background parallax, sliding highlight init, and scroll-in text reveal.
   const { contextSafe } = useGSAP(
     () => {
+      // Perspective entrance: the image expands from a scaled-down rounded card
+      // in perspective to full-bleed as the section scrolls into place.
+      if (stage.current) {
+        gsap.set(stage.current, { transformPerspective: 1200, transformOrigin: "50% 50%" });
+        gsap.fromTo(
+          stage.current,
+          { scale: 0.88, rotationX: 7, borderRadius: 48 },
+          {
+            scale: 1,
+            rotationX: 0,
+            borderRadius: 0,
+            ease: "none",
+            scrollTrigger: { trigger: root.current, start: "top bottom", end: "top 12%", scrub: 0.6 },
+          },
+        );
+      }
       if (bg.current) {
         gsap.fromTo(
           bg.current,
@@ -128,7 +145,7 @@ export default function Vision({ data, showStats = true }: { data?: VisionData; 
   return (
     <section id="vision" ref={root} aria-labelledby="vision-title" className="bg-creamy-100">
       {/* Cinematic campus image with parallax */}
-      <div className="relative h-[88vh] min-h-[560px] w-full overflow-hidden">
+      <div ref={stage} className="relative h-[88vh] min-h-[560px] w-full overflow-hidden [will-change:transform]">
         <div ref={bg} className="absolute inset-x-0 -top-[10%] h-[120%] [will-change:transform]">
           <Image
             src="/images/vision-campus.jpg"
