@@ -68,6 +68,16 @@
     "duration": "Duration",
     "cardCta": "Details & Application",
     "showAll": "Explore All Programs",
+    "learnMore": "Learn More",
+    "apply": "Apply Now",
+    "info": {
+      "mode": "Study Mode",
+      "modeValue": "On Campus",
+      "language": "Language",
+      "languageValue": "Arabic & English",
+      "award": "Award",
+      "awardValue": "Accredited"
+    },
     "status": {
       "open": "Open for Enrollment",
       "soon": "Coming Soon",

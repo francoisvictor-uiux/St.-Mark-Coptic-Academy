@@ -13,13 +13,138 @@ type ProgramItem = {
   duration: string;
   status: "open" | "soon" | "closed";
   image: string;
+  /** Optional enrichment — falls back to sensible academy-wide defaults. */
+  faculty?: string;
+  language?: string;
+  mode?: string;
+  award?: string;
 };
 
 const STATUS_STYLES: Record<ProgramItem["status"], string> = {
-  open: "bg-red-50 text-red-800",
-  soon: "bg-creamy-300 text-brown-400",
-  closed: "bg-ink-50 text-ink-400",
+  open: "bg-red-50 text-red-800 ring-red-800/10",
+  soon: "bg-creamy-300 text-brown-500 ring-brown-500/10",
+  closed: "bg-ink-50 text-ink-400 ring-ink-400/10",
 };
+
+/* ── info-row icons (1.5px stroke, inherit currentColor) ── */
+const iconProps = {
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.6,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+  className: "size-[17px]",
+  "aria-hidden": true,
+};
+const DurationIcon = () => (
+  <svg {...iconProps}><circle cx="12" cy="12.5" r="7.5" /><path d="M12 8.6V12.5l2.6 1.7" /><path d="M9 3.5h6" /></svg>
+);
+const ModeIcon = () => (
+  <svg {...iconProps}><path d="M4 9.5 12 5l8 4.5" /><path d="M5.5 9.7V19M18.5 9.7V19M9 10v9M15 10v9" /><path d="M3.5 19h17" /></svg>
+);
+const LanguageIcon = () => (
+  <svg {...iconProps}><circle cx="12" cy="12" r="8.2" /><path d="M3.8 12h16.4M12 3.8c2.4 2.2 3.6 5.1 3.6 8.2s-1.2 6-3.6 8.2c-2.4-2.2-3.6-5.1-3.6-8.2S9.6 6 12 3.8Z" /></svg>
+);
+const AwardIcon = () => (
+  <svg {...iconProps}><circle cx="12" cy="10" r="5.4" /><path d="m9.4 14.6-1.6 6 4.2-2.4 4.2 2.4-1.6-6" /><path d="m9.9 10 1.5 1.5L14.2 8.7" /></svg>
+);
+
+function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-2.5 min-w-0">
+      <span className="grid size-9 flex-none place-items-center rounded-[10px] border border-line bg-brown-500/[0.04] text-brown-500">
+        {icon}
+      </span>
+      <span className="min-w-0">
+        <span className="block font-sans text-[10px] font-semibold uppercase tracking-[0.09em] text-brown-400">{label}</span>
+        <span className="mt-0.5 block truncate font-serif text-[13.5px] font-medium text-brown-900">{value}</span>
+      </span>
+    </div>
+  );
+}
+
+function ProgramCard({
+  program,
+  t,
+}: {
+  program: ProgramItem;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const language = program.language ?? t("info.languageValue");
+  const mode = program.mode ?? t("info.modeValue");
+  const award = program.award ?? t("info.awardValue");
+
+  return (
+    <article
+      data-reveal
+      className="group flex flex-col overflow-hidden rounded-[20px] border border-line bg-creamy-50 transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1.5 hover:border-brown-200 hover:shadow-[0_26px_54px_-26px_rgba(86,40,35,0.5)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+    >
+      {/* Featured image */}
+      <div className="relative aspect-[16/10] overflow-hidden">
+        <Image
+          src={program.image}
+          alt=""
+          fill
+          sizes="(min-width: 1280px) 300px, (min-width: 640px) 50vw, 100vw"
+          className="object-cover transition-transform duration-[650ms] ease-out group-hover:scale-[1.06] motion-reduce:group-hover:scale-100"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(36,17,15,0.34),rgba(36,17,15,0.04)_36%,transparent_66%,rgba(36,17,15,0.14))]"
+        />
+        <span
+          className={`absolute top-4 start-4 inline-flex items-center rounded-full px-3 py-1.5 font-sans text-[11px] font-bold uppercase tracking-[0.08em] shadow-sm ring-1 backdrop-blur-md transition-transform duration-300 ease-out group-hover:scale-105 ${STATUS_STYLES[program.status]}`}
+        >
+          {t(`status.${program.status}`)}
+        </span>
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-1 flex-col p-6">
+        {program.faculty ? (
+          <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-brown-400">{program.faculty}</p>
+        ) : null}
+        <h3 className={`${program.faculty ? "mt-2" : ""} font-serif text-[21px] font-bold leading-snug text-balance text-brown-900`}>
+          <Link
+            href="/programs"
+            className="rounded-sm outline-none transition-colors hover:text-brown-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brown-500"
+          >
+            {program.title}
+          </Link>
+        </h3>
+        <p className="mt-3 line-clamp-3 font-serif text-[14.5px] font-light leading-[1.6] text-brown-400">
+          {program.description}
+        </p>
+
+        {/* Information row */}
+        <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-line pt-5">
+          <InfoItem icon={<DurationIcon />} label={t("duration")} value={program.duration} />
+          <InfoItem icon={<ModeIcon />} label={t("info.mode")} value={mode} />
+          <InfoItem icon={<LanguageIcon />} label={t("info.language")} value={language} />
+          <InfoItem icon={<AwardIcon />} label={t("info.award")} value={award} />
+        </dl>
+
+        {/* Actions */}
+        <div className="mt-auto flex gap-3 border-t border-line pt-5 max-[380px]:flex-col">
+          <Link
+            href="/programs"
+            className="inline-flex min-h-[46px] flex-1 items-center justify-center gap-2 rounded-xl bg-brown-500 px-4 font-serif text-[15px] font-bold text-creamy-50 transition-[background-color,transform] duration-200 hover:bg-brown-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brown-500 active:scale-[0.98]"
+          >
+            {t("learnMore")}
+            <ArrowIcon className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:rtl:-translate-x-0.5" />
+          </Link>
+          <Link
+            href="/register"
+            className="inline-flex min-h-[46px] flex-1 items-center justify-center rounded-xl border border-line px-4 font-serif text-[15px] font-bold text-brown-500 transition-colors duration-200 hover:border-brown-400 hover:bg-brown-500/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brown-500 active:scale-[0.98]"
+          >
+            {t("apply")}
+          </Link>
+        </div>
+      </div>
+    </article>
+  );
+}
 
 export default function Programs({ items: itemsProp, labels }: { items?: ProgramItem[]; labels?: { label?: string; subtitle?: string } }) {
   const t = useTranslations("programs");
@@ -35,59 +160,7 @@ export default function Programs({ items: itemsProp, labels }: { items?: Program
 
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
           {programs.map((program) => (
-            <article key={program.id} data-reveal className="group h-[430px]">
-              <Link
-                href="/programs"
-                aria-label={`${t("cardCta")}: ${program.title}`}
-                className="relative block h-full overflow-hidden rounded-card shadow-[0_0_40px_-18px_rgba(86,40,35,0.45)] transition-all duration-500 ease-in-out group-hover:scale-[1.03] group-hover:shadow-[0_0_60px_-15px_rgba(86,40,35,0.65)] motion-reduce:group-hover:scale-100"
-              >
-                {/* Full-bleed image with parallax zoom */}
-                <Image
-                  src={program.image}
-                  alt=""
-                  fill
-                  sizes="(min-width: 1280px) 300px, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-110 motion-reduce:group-hover:scale-100"
-                />
-
-                {/* Brand gradient overlay */}
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 bg-[linear-gradient(to_top,rgba(56,25,21,0.94),rgba(86,40,35,0.62)_38%,rgba(86,40,35,0.12)_68%,transparent_82%)]"
-                />
-
-                <span
-                  className={`absolute top-4 start-4 rounded-full px-3.5 py-1.5 font-serif text-[13px] font-bold ${STATUS_STYLES[program.status]}`}
-                >
-                  {t(`status.${program.status}`)}
-                </span>
-
-                {/* Content over the image */}
-                <div className="relative flex h-full flex-col justify-end gap-2.5 p-6 text-creamy-50">
-                  <h3 className="font-serif text-xl font-bold leading-snug">
-                    {program.title}
-                  </h3>
-                  <p className="font-serif text-[14.5px] font-light leading-[1.7] text-creamy-100/85">
-                    {program.description}
-                  </p>
-                  <p className="flex items-center gap-2 font-serif text-sm text-creamy-100/70">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-4" aria-hidden="true">
-                      <circle cx="12" cy="12" r="9" />
-                      <path d="M12 7v5l3 3" />
-                    </svg>
-                    <span>
-                      {t("duration")}: {program.duration}
-                    </span>
-                  </p>
-
-                  {/* Glass CTA bar */}
-                  <div className="mt-3 flex items-center justify-between rounded-full border border-creamy-100/25 bg-creamy-100/10 px-5 py-3 font-serif text-[15px] font-bold backdrop-blur-md transition-all duration-300 group-hover:border-creamy-100/45 group-hover:bg-creamy-100/20">
-                    <span>{t("cardCta")}</span>
-                    <ArrowIcon className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:rtl:-translate-x-0.5" />
-                  </div>
-                </div>
-              </Link>
-            </article>
+            <ProgramCard key={program.id} program={program} t={t} />
           ))}
         </div>
 

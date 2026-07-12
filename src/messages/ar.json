@@ -68,6 +68,16 @@
     "duration": "المدة",
     "cardCta": "التفاصيل والتقديم",
     "showAll": "استكشف جميع البرامج",
+    "learnMore": "اعرف المزيد",
+    "apply": "قدّم الآن",
+    "info": {
+      "mode": "نظام الدراسة",
+      "modeValue": "انتظام",
+      "language": "اللغة",
+      "languageValue": "عربي وإنجليزي",
+      "award": "الشهادة",
+      "awardValue": "معتمدة"
+    },
     "status": {
       "open": "مفتوح للتسجيل",
       "soon": "قريبًا",
