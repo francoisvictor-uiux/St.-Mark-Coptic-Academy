@@ -93,19 +93,21 @@ export default function Preloader() {
             { autoAlpha: 0, duration: 0.5, ease: "power2.in" },
             "+=0.5",
           )
+          // Open the cross and dive into it — the sheet scales up so we pass
+          // through the growing cross onto the page (no fade).
           .to(
             ref.current,
             {
-              ["--cross"]: 3200,
-              duration: 1.05,
+              ["--cross"]: 2600,
+              scale: 3.6,
+              transformOrigin: "50% 50%",
+              duration: 1.2,
               ease: "power2.in",
               // Let the hero begin its entrance while the cross opens
               onStart: () => window.dispatchEvent(new Event("preloader:done")),
             },
             "-=0.15",
-          )
-          // Clear the last corner slivers the cross arms can't cover
-          .to(ref.current, { autoAlpha: 0, duration: 0.4, ease: "power1.out" }, "-=0.4");
+          );
       });
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
