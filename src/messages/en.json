@@ -40,7 +40,15 @@
     "cardTitle": "Our Vision",
     "body": "To be the leading, integrated academic reference in ecclesiastical education and church-based scholarly research — uniting theological colleges and ecclesiastical institutes under one umbrella; safeguarding the Apostolic Tradition and preserving the Patristic heritage; strengthening Coptic identity and affirming its presence in the modern era; serving the Church and society through innovative education, research and creativity; and enriching cultural and scholarly dialogue locally, regionally and internationally — drawing inspiration from the spirit of the early Christian School of Alexandria.",
     "imageAlt1": "Academic conference in the grand lecture hall",
-    "imageAlt2": "Manuscripts and references from the academy library"
+    "imageAlt2": "Manuscripts and references from the academy library",
+    "kicker": "Vision & Mission",
+    "visionTab": "Our Vision",
+    "missionTab": "Our Mission",
+    "visionHeadline": "The leading reference in ecclesiastical education.",
+    "missionTitle": "Our Mission",
+    "missionHeadline": "Forming servants and scholars for the Church.",
+    "missionBody": "To provide integrated academic and spiritual formation rooted in the Apostolic Tradition — preparing clergy, teachers and researchers through rigorous theological study, to preserve the Patristic heritage, renew Coptic identity, and serve the Church and society with faith, scholarship and love.",
+    "imageAlt": "St. Mark Coptic Academy campus"
   },
   "stats": {
     "items": [

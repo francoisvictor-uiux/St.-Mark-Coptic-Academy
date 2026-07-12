@@ -1,8 +1,15 @@
+"use client";
+
 import Image from "next/image";
+import { useRef, useState } from "react";
 import { useTranslations, useMessages } from "next-intl";
-import SectionHeader from "@/components/ui/SectionHeader";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Reveal from "@/components/ui/Reveal";
 import StatCounter from "@/components/ui/StatCounter";
+
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 type StatItem = { value: number; label: string };
 
@@ -11,105 +18,211 @@ export type VisionData = {
   image1?: string; image2?: string; stats?: StatItem[];
 };
 
+type TabKey = "vision" | "mission";
+const TABS: TabKey[] = ["vision", "mission"];
+
 export default function Vision({ data, showStats = true }: { data?: VisionData; showStats?: boolean }) {
   const t = useTranslations("vision");
-  const messages = useMessages() as {
-    stats: { items: StatItem[] };
-  };
+  const messages = useMessages() as { stats: { items: StatItem[] } };
   const stats = data?.stats && data.stats.length > 0 ? data.stats : messages.stats.items;
 
+  const [tab, setTab] = useState<TabKey>("vision");
+  const [shown, setShown] = useState<TabKey>("vision");
+
+  const root = useRef<HTMLElement>(null);
+  const bg = useRef<HTMLDivElement>(null);
+  const kicker = useRef<HTMLParagraphElement>(null);
+  const tabsBar = useRef<HTMLDivElement>(null);
+  const highlight = useRef<HTMLSpanElement>(null);
+  const headline = useRef<HTMLHeadingElement>(null);
+  const body = useRef<HTMLParagraphElement>(null);
+  const firstSwap = useRef(true);
+
+  const headlineText = shown === "vision" ? t("visionHeadline") : t("missionHeadline");
+  const bodyText = shown === "vision" ? data?.body || t("body") : t("missionBody");
+
+  const moveHighlight = (animate: boolean) => {
+    const bar = tabsBar.current;
+    const hl = highlight.current;
+    if (!bar || !hl) return;
+    const active = bar.querySelector<HTMLElement>('[data-active="true"]');
+    if (!active) return;
+    const x = active.getBoundingClientRect().left - bar.getBoundingClientRect().left;
+    const width = active.offsetWidth;
+    if (animate) gsap.to(hl, { x, width, duration: 0.45, ease: "power3.out" });
+    else gsap.set(hl, { x, width });
+  };
+
+  // Background parallax, sliding highlight init, and scroll-in text reveal.
+  const { contextSafe } = useGSAP(
+    () => {
+      if (bg.current) {
+        gsap.fromTo(
+          bg.current,
+          { yPercent: -8 },
+          {
+            yPercent: 8,
+            ease: "none",
+            scrollTrigger: { trigger: root.current, start: "top bottom", end: "bottom top", scrub: true },
+          },
+        );
+      }
+      moveHighlight(false);
+      const els = [kicker.current, tabsBar.current, headline.current, body.current];
+      gsap.set(els, { autoAlpha: 0, y: 44 });
+      ScrollTrigger.create({
+        trigger: root.current,
+        start: "top 68%",
+        once: true,
+        onEnter: () => gsap.to(els, { autoAlpha: 1, y: 0, duration: 1.1, ease: "expo.out", stagger: 0.14 }),
+      });
+    },
+    { scope: root },
+  );
+
+  // Smooth reveal of the swapped content (skips the initial render).
+  useGSAP(
+    () => {
+      if (firstSwap.current) {
+        firstSwap.current = false;
+        return;
+      }
+      gsap.fromTo(
+        [headline.current, body.current],
+        { autoAlpha: 0, y: 26 },
+        { autoAlpha: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.08, overwrite: true },
+      );
+    },
+    { dependencies: [shown], scope: root },
+  );
+
+  // Slide the tab highlight to the active tab.
+  useGSAP(() => moveHighlight(true), { dependencies: [tab], scope: root });
+
+  const changeTab = contextSafe((next: TabKey) => {
+    if (next === tab) return;
+    setTab(next);
+    gsap.to([headline.current, body.current], {
+      autoAlpha: 0,
+      y: -20,
+      duration: 0.3,
+      ease: "power2.in",
+      overwrite: true,
+      onComplete: () => setShown(next),
+    });
+  });
+
   return (
-    <section id="vision" aria-labelledby="vision-title" className="bg-creamy-100 py-16 md:py-24">
-      <Reveal className="mx-auto flex max-w-[1248px] flex-col gap-10 px-4 md:gap-14 md:px-8">
-        <SectionHeader label={data?.label || t("label")} subtitle={data?.subtitle || t("subtitle")} />
+    <section id="vision" ref={root} aria-labelledby="vision-title" className="bg-creamy-100">
+      {/* Cinematic campus image with parallax */}
+      <div className="relative h-[88vh] min-h-[560px] w-full overflow-hidden">
+        <div ref={bg} className="absolute inset-x-0 -top-[10%] h-[120%] [will-change:transform]">
+          <Image
+            src="/images/vision-campus.jpg"
+            alt={t("imageAlt")}
+            fill
+            sizes="100vw"
+            className="object-cover"
+          />
+        </div>
+        {/* Legibility gradient (top + bottom darkened) */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-b from-brown-900/70 via-brown-900/25 to-brown-900/90"
+        />
 
-        <div className="grid gap-[30px] lg:grid-cols-[1fr_407px]">
-          {/* Vision card */}
-          <article
-            data-reveal
-            className="relative overflow-hidden rounded-card bg-brown-500 p-8 pb-32 text-creamy-100 md:p-14 md:pb-36 lg:min-h-[570px]"
-          >
-            <h3 id="vision-title" className="font-serif text-3xl font-medium md:text-5xl md:leading-[1.6]">
-              {data?.cardTitle || t("cardTitle")}
-            </h3>
-            <p className="mt-6 max-w-[704px] font-serif text-lg font-light leading-[1.75] text-creamy-100/95 md:text-2xl md:leading-[38px]">
-              {data?.body || t("body")}
+        <div className="relative z-10 mx-auto flex h-full max-w-[1440px] flex-col justify-between px-5 py-10 md:px-12 md:py-16">
+          {/* Top: kicker + tabs */}
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <p
+              ref={kicker}
+              className="font-sans text-[12px] font-semibold uppercase tracking-[0.22em] text-creamy-100/85"
+            >
+              {t("kicker")}
             </p>
-
-            {/* Inverted-corner notch with the red cross medallion (Figma motif) */}
-            <div aria-hidden="true" className="absolute bottom-0 left-0">
-              <div className="relative flex h-[120px] w-[150px] items-end md:h-[140px] md:w-[170px]">
-                <div className="flex h-full w-full items-center justify-center rounded-tr-card bg-creamy-100">
-                  <div className="flex size-[90px] items-center justify-center rounded-full bg-red-500 md:size-[110px]">
-                    <Image
-                      src="/Logo.svg"
-                      alt=""
-                      width={51}
-                      height={51}
-                      className="size-[42px] md:size-[51px]"
-                    />
-                  </div>
-                </div>
-                {/* concave corner pieces */}
-                <div className="absolute -top-10 left-0 size-10 [background:radial-gradient(circle_40px_at_100%_0%,transparent_40px,var(--color-creamy-100)_40px)]" />
-                <div className="absolute bottom-0 -right-10 size-10 [background:radial-gradient(circle_40px_at_100%_0%,transparent_40px,var(--color-creamy-100)_40px)]" />
-              </div>
-            </div>
-          </article>
-
-          {/* Side imagery */}
-          <div className="grid grid-cols-2 gap-[30px] lg:grid-cols-1 lg:grid-rows-[327px_213px]">
-            <div data-reveal className="relative h-48 overflow-hidden rounded-card sm:h-64 lg:h-auto">
-              <Image
-                src={data?.image1 || "/images/photo-2.jpg"}
-                alt={t("imageAlt1")}
-                fill
-                sizes="(min-width: 1024px) 407px, 50vw"
-                className="object-cover"
+            <div
+              ref={tabsBar}
+              role="tablist"
+              aria-label={t("kicker")}
+              className="relative inline-flex w-fit items-center gap-1 rounded-full bg-creamy-100/12 p-1 shadow-[inset_0_0_0_1px_rgba(254,246,240,0.22)] backdrop-blur-md"
+            >
+              <span
+                ref={highlight}
+                aria-hidden="true"
+                className="absolute inset-y-1 left-0 rounded-full bg-creamy-100"
+                style={{ width: 0 }}
               />
-            </div>
-            <div data-reveal className="relative h-48 overflow-hidden rounded-card sm:h-64 lg:h-auto">
-              <Image
-                src={data?.image2 || "/images/photo-1.jpg"}
-                alt={t("imageAlt2")}
-                fill
-                sizes="(min-width: 1024px) 407px, 50vw"
-                className="object-cover"
-              />
+              {TABS.map((key) => {
+                const active = tab === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    data-active={active}
+                    onClick={() => changeTab(key)}
+                    className={`relative z-10 flex h-9 items-center justify-center rounded-full px-5 font-serif text-[15px] font-bold transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-creamy-100 md:h-10 md:text-[16px] ${
+                      active ? "text-brown-900" : "text-creamy-100/80 hover:text-creamy-100"
+                    }`}
+                  >
+                    {t(key === "vision" ? "visionTab" : "missionTab")}
+                  </button>
+                );
+              })}
             </div>
           </div>
-        </div>
 
-        {/* Stats */}
-        {showStats ? (
-        <dl className="grid grid-cols-2 gap-x-6 gap-y-10 py-6 md:py-14 lg:grid-cols-4 lg:justify-items-center">
-          {stats.map((stat) => (
-            <div key={stat.label} className="flex flex-col items-center gap-2" data-reveal>
-              <dd className="flex items-start gap-1 text-brown-900" dir="ltr">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  aria-hidden="true"
-                  className="mt-1 size-6 text-red-500 md:size-[30px]"
-                >
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-                <StatCounter
-                  value={stat.value}
-                  className="font-archivo text-[56px] font-light leading-none md:text-[80px]"
-                />
-              </dd>
-              <dt className="font-serif text-[16px] font-light text-brown-400 md:text-[18.4px]">
-                {stat.label}
-              </dt>
-            </div>
-          ))}
-        </dl>
-        ) : null}
-      </Reveal>
+          {/* Bottom: headline + body */}
+          <div className="grid items-end gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+            <h2
+              id="vision-title"
+              ref={headline}
+              className="max-w-[15ch] text-balance font-serif text-[34px] font-medium leading-[1.1] text-creamy-50 sm:text-5xl md:text-6xl lg:text-[68px]"
+            >
+              {headlineText}
+            </h2>
+            <p
+              ref={body}
+              className="font-serif text-[16px] font-light leading-[1.85] text-creamy-100/90 md:text-[18px]"
+            >
+              {bodyText}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats strip */}
+      {showStats ? (
+        <Reveal className="mx-auto max-w-[1248px] px-4 py-14 md:px-8 md:py-20">
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4 lg:justify-items-center">
+            {stats.map((stat) => (
+              <div key={stat.label} className="flex flex-col items-center gap-2" data-reveal>
+                <dd className="flex items-start gap-1 text-brown-900" dir="ltr">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    aria-hidden="true"
+                    className="mt-1 size-6 text-red-500 md:size-[30px]"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  <StatCounter
+                    value={stat.value}
+                    className="font-archivo text-[56px] font-light leading-none md:text-[80px]"
+                  />
+                </dd>
+                <dt className="font-serif text-[16px] font-light text-brown-400 md:text-[18.4px]">
+                  {stat.label}
+                </dt>
+              </div>
+            ))}
+          </dl>
+        </Reveal>
+      ) : null}
     </section>
   );
 }
