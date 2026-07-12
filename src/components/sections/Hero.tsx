@@ -141,7 +141,7 @@ export default function Hero({ overrides }: { overrides?: { eyebrow?: string; ti
           </span>
           <span data-hero-cta>
             <Magnetic>
-              <PillButton href="#apply" variant="pink">
+              <PillButton href="#apply" variant="outlinePink">
                 {overrides?.ctaSecondary ?? t("ctaSecondary")}
               </PillButton>
             </Magnetic>
