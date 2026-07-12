@@ -32,18 +32,37 @@ export default function MobileMenu({
   const panel = useRef<HTMLDivElement>(null);
   const curve = useRef<SVGPathElement>(null);
   const cp = useRef({ c: -100 }); // curve control-point x (bulged when hidden, flat when open)
+  const first = useRef(true);
 
+  const setPath = () => {
+    curve.current?.setAttribute(
+      "d",
+      `M100 0 L100 ${window.innerHeight} Q${cp.current.c} ${window.innerHeight / 2} 100 0`,
+    );
+  };
+
+  // Establish the hidden initial state before first paint — GSAP owns the
+  // panel transform (no Tailwind translate class) so xPercent stays clean.
   useGSAP(
     () => {
+      gsap.set(panel.current, { xPercent: 100 });
+      gsap.set(backdrop.current, { autoAlpha: 0 });
+      setPath();
+    },
+    { scope: root },
+  );
+
+  // Animate open/closed. Skip the initial run so it doesn't touch Lenis on mount.
+  useGSAP(
+    () => {
+      if (first.current) {
+        first.current = false;
+        return;
+      }
       const b = backdrop.current;
       const p = panel.current;
-      const c = curve.current;
       if (!b || !p) return;
       const links = p.querySelectorAll<HTMLElement>("[data-menu-item]");
-      const h = window.innerHeight;
-      const setPath = () =>
-        c?.setAttribute("d", `M100 0 L100 ${h} Q${cp.current.c} ${h / 2} 100 0`);
-      setPath();
 
       if (open) {
         gsap.set(root.current, { pointerEvents: "auto" });
@@ -80,14 +99,14 @@ export default function MobileMenu({
       <div
         ref={backdrop}
         onClick={onClose}
-        className="absolute inset-0 bg-brown-900/50 opacity-0 backdrop-blur-sm"
+        className="absolute inset-0 bg-brown-900/50 backdrop-blur-sm"
       />
 
       {/* Sliding panel */}
       <div
         ref={panel}
         id="mobile-menu"
-        className="absolute inset-y-0 right-0 flex w-[min(84vw,360px)] translate-x-full flex-col bg-brown-900 px-8 pb-10 pt-28 text-creamy-100"
+        className="absolute inset-y-0 right-0 flex w-[min(84vw,360px)] flex-col bg-brown-900 px-8 pb-10 pt-28 text-creamy-100"
       >
         {/* Morphing curved seam on the panel's inner edge */}
         <svg
