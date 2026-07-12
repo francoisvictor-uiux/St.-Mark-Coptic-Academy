@@ -29,8 +29,8 @@ const EMBLEM: React.CSSProperties = {
 const PATTERN: React.CSSProperties = {
   opacity: 0,
   backgroundColor: CREAM,
-  WebkitMaskImage: "url(/Pattern.svg), linear-gradient(to top, #000, transparent 70%)",
-  maskImage: "url(/Pattern.svg), linear-gradient(to top, #000, transparent 70%)",
+  WebkitMaskImage: "url(/Pattern.svg), linear-gradient(to top, #000, transparent 50%)",
+  maskImage: "url(/Pattern.svg), linear-gradient(to top, #000, transparent 50%)",
   WebkitMaskRepeat: "repeat, no-repeat",
   maskRepeat: "repeat, no-repeat",
   WebkitMaskSize: "374px 212px, 100% 100%",
@@ -133,7 +133,7 @@ export default function Preloader() {
       <div
         data-loader-pattern
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[52vh] opacity-[0.025]"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[52vh] opacity-[0.015]"
         style={PATTERN}
       />
 
