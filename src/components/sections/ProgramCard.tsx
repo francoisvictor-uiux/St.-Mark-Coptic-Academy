@@ -55,13 +55,13 @@ const AwardIcon = () => (
 
 function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="flex items-center gap-2.5 min-w-0">
+    <div className="flex items-start gap-2.5 min-w-0">
       <span className="grid size-9 flex-none place-items-center rounded-[10px] border border-line bg-brown-500/[0.04] text-brown-500">
         {icon}
       </span>
-      <span className="min-w-0">
+      <span className="min-w-0 pt-0.5">
         <span className="block font-sans text-[10px] font-semibold uppercase tracking-[0.09em] text-brown-400">{label}</span>
-        <span className="mt-0.5 block truncate font-serif text-[14px] font-medium text-brown-900">{value}</span>
+        <span className="mt-0.5 block font-serif text-[14px] font-medium leading-snug text-balance text-brown-900">{value}</span>
       </span>
     </div>
   );
@@ -90,8 +90,15 @@ export default function ProgramCard({ program }: { program: ProgramItem }) {
       const badgeTo = badge ? gsap.quickTo(badge, "scale", { duration: 0.45, ease: "back.out(2.6)" }) : null;
       const arrowTo = arrow ? gsap.quickTo(arrow, "x", { duration: 0.4, ease: "power3.out" }) : null;
 
-      const enter = () => { card(1.04); imgTo?.(1.05); badgeTo?.(1.08); arrowTo?.(5 * dir); };
-      const leave = () => { card(1); imgTo?.(1); badgeTo?.(1); arrowTo?.(0); };
+      // Squishy morphing background (circle ↔ ellipse) — paused, played/reversed on hover.
+      const circle = el.querySelector<SVGElement>("[data-morph-circle]");
+      const ellipse = el.querySelector<SVGElement>("[data-morph-ellipse]");
+      const morph = gsap.timeline({ paused: true, defaults: { duration: 0.9, ease: "back.inOut(1.4)", transformOrigin: "50% 50%" } });
+      if (circle) morph.to(circle, { scaleY: 0.5, y: -22, opacity: 0.09 }, 0.15);
+      if (ellipse) morph.to(ellipse, { scaleY: 2.1, y: -22, opacity: 0.08 }, 0.15);
+
+      const enter = () => { card(1.04); imgTo?.(1.05); badgeTo?.(1.08); arrowTo?.(5 * dir); morph.play(); };
+      const leave = () => { card(1); imgTo?.(1); badgeTo?.(1); arrowTo?.(0); morph.reverse(); };
 
       el.addEventListener("pointerenter", enter);
       el.addEventListener("pointerleave", leave);
@@ -137,7 +144,19 @@ export default function ProgramCard({ program }: { program: ProgramItem }) {
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col p-7">
+      <div className="relative flex flex-1 flex-col p-7">
+        {/* Squishy morphing accent — brand-toned, sits behind the copy */}
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 320 320"
+          preserveAspectRatio="xMidYMid slice"
+          className="pointer-events-none absolute inset-0 z-0 size-full text-brown-500"
+        >
+          <circle data-morph-circle cx="160" cy="60" r="118" fill="currentColor" opacity="0.05" />
+          <ellipse data-morph-ellipse cx="160" cy="270" rx="118" ry="44" fill="currentColor" opacity="0.045" />
+        </svg>
+
+        <div className="relative z-10 flex flex-1 flex-col">
         {program.faculty ? (
           <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-brown-400">{program.faculty}</p>
         ) : null}
@@ -176,6 +195,7 @@ export default function ProgramCard({ program }: { program: ProgramItem }) {
           >
             {t("apply")}
           </Link>
+        </div>
         </div>
       </div>
     </article>
