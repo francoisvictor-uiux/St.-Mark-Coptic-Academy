@@ -187,7 +187,9 @@ class Media {
   }
 
   createShader() {
-    const texture = new Texture(this.gl, { generateMipmaps: true });
+    // Anisotropic filtering keeps the images crisp even when the bend angles
+    // them; mipmaps avoid shimmering when they're scaled down.
+    const texture = new Texture(this.gl, { generateMipmaps: true, anisotropy: 8 });
     this.program = new Program(this.gl, {
       depthTest: false,
       depthWrite: false,
@@ -232,7 +234,7 @@ class Media {
           vec4 color = texture2D(tMap, uv);
 
           float d = roundedBoxSDF(vUv - 0.5, vec2(0.5 - uBorderRadius), uBorderRadius);
-          float edgeSmooth = 0.002;
+          float edgeSmooth = 0.0035;
           float alpha = 1.0 - smoothstep(-edgeSmooth, edgeSmooth, d);
 
           gl_FragColor = vec4(color.rgb, alpha);
@@ -310,8 +312,8 @@ class Media {
     if (screen) this.screen = screen;
     if (viewport) this.viewport = viewport;
     this.scale = this.screen.height / 1500;
-    this.plane.scale.y = (this.viewport.height * (900 * this.scale)) / this.screen.height;
-    this.plane.scale.x = (this.viewport.width * (700 * this.scale)) / this.screen.width;
+    this.plane.scale.y = (this.viewport.height * (1150 * this.scale)) / this.screen.height;
+    this.plane.scale.x = (this.viewport.width * (890 * this.scale)) / this.screen.width;
     this.program.uniforms.uPlaneSizes.value = [this.plane.scale.x, this.plane.scale.y];
     this.padding = 2;
     this.width = this.plane.scale.x + this.padding;
