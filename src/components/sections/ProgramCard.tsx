@@ -90,15 +90,8 @@ export default function ProgramCard({ program }: { program: ProgramItem }) {
       const badgeTo = badge ? gsap.quickTo(badge, "scale", { duration: 0.45, ease: "back.out(2.6)" }) : null;
       const arrowTo = arrow ? gsap.quickTo(arrow, "x", { duration: 0.4, ease: "power3.out" }) : null;
 
-      // Squishy morphing background (circle ↔ ellipse) — paused, played/reversed on hover.
-      const circle = el.querySelector<SVGElement>("[data-morph-circle]");
-      const ellipse = el.querySelector<SVGElement>("[data-morph-ellipse]");
-      const morph = gsap.timeline({ paused: true, defaults: { duration: 0.9, ease: "back.inOut(1.4)", transformOrigin: "50% 50%" } });
-      if (circle) morph.to(circle, { scaleY: 0.5, y: -22, opacity: 0.09 }, 0.15);
-      if (ellipse) morph.to(ellipse, { scaleY: 2.1, y: -22, opacity: 0.08 }, 0.15);
-
-      const enter = () => { card(1.04); imgTo?.(1.05); badgeTo?.(1.08); arrowTo?.(5 * dir); morph.play(); };
-      const leave = () => { card(1); imgTo?.(1); badgeTo?.(1); arrowTo?.(0); morph.reverse(); };
+      const enter = () => { card(1.04); imgTo?.(1.05); badgeTo?.(1.08); arrowTo?.(5 * dir); };
+      const leave = () => { card(1); imgTo?.(1); badgeTo?.(1); arrowTo?.(0); };
 
       el.addEventListener("pointerenter", enter);
       el.addEventListener("pointerleave", leave);
@@ -144,19 +137,7 @@ export default function ProgramCard({ program }: { program: ProgramItem }) {
       </div>
 
       {/* Content */}
-      <div className="relative flex flex-1 flex-col p-7">
-        {/* Squishy morphing accent — brand-toned, sits behind the copy */}
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 320 320"
-          preserveAspectRatio="xMidYMid slice"
-          className="pointer-events-none absolute inset-0 z-0 size-full text-brown-500"
-        >
-          <circle data-morph-circle cx="160" cy="60" r="118" fill="currentColor" opacity="0.05" />
-          <ellipse data-morph-ellipse cx="160" cy="270" rx="118" ry="44" fill="currentColor" opacity="0.045" />
-        </svg>
-
-        <div className="relative z-10 flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col p-7">
         {program.faculty ? (
           <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-brown-400">{program.faculty}</p>
         ) : null}
@@ -195,7 +176,6 @@ export default function ProgramCard({ program }: { program: ProgramItem }) {
           >
             {t("apply")}
           </Link>
-        </div>
         </div>
       </div>
     </article>
