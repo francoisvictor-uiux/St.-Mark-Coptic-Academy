@@ -7,6 +7,7 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import CopticCross from "@/components/ui/CopticCross";
 import PillButton from "@/components/ui/PillButton";
+import Magnetic from "@/components/ui/Magnetic";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -139,9 +140,11 @@ export default function Hero({ overrides }: { overrides?: { eyebrow?: string; ti
             </PillButton>
           </span>
           <span data-hero-cta>
-            <PillButton href="#apply" variant="outline">
-              {overrides?.ctaSecondary ?? t("ctaSecondary")}
-            </PillButton>
+            <Magnetic>
+              <PillButton href="#apply" variant="pink">
+                {overrides?.ctaSecondary ?? t("ctaSecondary")}
+              </PillButton>
+            </Magnetic>
           </span>
         </div>
       </div>

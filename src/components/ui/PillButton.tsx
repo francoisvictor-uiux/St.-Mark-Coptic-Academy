@@ -4,7 +4,7 @@ import ArrowIcon from "./ArrowIcon";
 type PillButtonProps = {
   children: React.ReactNode;
   href?: string;
-  variant?: "primary" | "outline" | "light";
+  variant?: "primary" | "outline" | "light" | "pink";
   withArrow?: boolean;
   className?: string;
   type?: "button" | "submit";
@@ -22,6 +22,8 @@ const variants = {
     "border border-brown-500 text-brown-500 hover:bg-brown-500/5 active:bg-brown-500/10",
   light:
     "bg-creamy-100 text-brown-500 hover:bg-creamy-300 active:bg-creamy-400",
+  pink:
+    "bg-[#D46A6B] text-brown-900 hover:bg-[#c85f60] active:bg-[#bd5657]",
 };
 
 /**
