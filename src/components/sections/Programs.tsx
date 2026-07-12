@@ -58,7 +58,7 @@ function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string
       </span>
       <span className="min-w-0">
         <span className="block font-sans text-[10px] font-semibold uppercase tracking-[0.09em] text-brown-400">{label}</span>
-        <span className="mt-0.5 block truncate font-serif text-[13.5px] font-medium text-brown-900">{value}</span>
+        <span className="mt-0.5 block truncate font-serif text-[14px] font-medium text-brown-900">{value}</span>
       </span>
     </div>
   );
@@ -86,7 +86,7 @@ function ProgramCard({
           src={program.image}
           alt=""
           fill
-          sizes="(min-width: 1280px) 300px, (min-width: 640px) 50vw, 100vw"
+          sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-[650ms] ease-out group-hover:scale-[1.06] motion-reduce:group-hover:scale-100"
         />
         <div
@@ -101,11 +101,11 @@ function ProgramCard({
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col p-6">
+      <div className="flex flex-1 flex-col p-7">
         {program.faculty ? (
           <p className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-brown-400">{program.faculty}</p>
         ) : null}
-        <h3 className={`${program.faculty ? "mt-2" : ""} font-serif text-[21px] font-bold leading-snug text-balance text-brown-900`}>
+        <h3 className={`${program.faculty ? "mt-2" : ""} font-serif text-[23px] font-bold leading-[1.2] text-balance text-brown-900`}>
           <Link
             href="/programs"
             className="rounded-sm outline-none transition-colors hover:text-brown-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brown-500"
@@ -113,7 +113,7 @@ function ProgramCard({
             {program.title}
           </Link>
         </h3>
-        <p className="mt-3 line-clamp-3 font-serif text-[14.5px] font-light leading-[1.6] text-brown-400">
+        <p className="mt-3 line-clamp-3 font-serif text-[15px] font-light leading-[1.62] text-brown-400">
           {program.description}
         </p>
 
@@ -158,8 +158,8 @@ export default function Programs({ items: itemsProp, labels }: { items?: Program
       <Reveal className="mx-auto flex max-w-[1248px] flex-col gap-10 px-4 md:gap-14 md:px-8">
         <SectionHeader label={labels?.label || t("label")} subtitle={labels?.subtitle || t("subtitle")} />
 
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {programs.map((program) => (
+        <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+          {programs.slice(0, 3).map((program) => (
             <ProgramCard key={program.id} program={program} t={t} />
           ))}
         </div>
