@@ -7,104 +7,110 @@ import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(useGSAP);
 
+const BROWN = "#562823"; // brand brown — the loading sheet
+const CREAM = "#FEF6F0"; // page-background cream — the cross
+
+// Full-cover sheet (flat bottom) → sheet with an upward curve carved out.
+const FLAT = "M0 0 L100 0 L100 100 Q50 100 0 100 Z";
+const CURVED = "M0 0 L100 0 L100 100 Q50 42 0 100 Z";
+
+const CROSS_MASK: React.CSSProperties = {
+  backgroundColor: CREAM,
+  WebkitMaskImage: "url(/Cross.svg)",
+  maskImage: "url(/Cross.svg)",
+  WebkitMaskRepeat: "no-repeat",
+  maskRepeat: "no-repeat",
+  WebkitMaskPosition: "center",
+  maskPosition: "center",
+  WebkitMaskSize: "contain",
+  maskSize: "contain",
+};
+
 /**
- * Full-screen intro overlay shown on every hard page load. The hero pauses
- * its entrance while `[data-preloader]` is in the DOM and resumes on the
- * `preloader:done` window event.
+ * Full-screen intro overlay shown on every hard page load. Brand-brown sheet
+ * with the creamy Cross emblem; on exit the sheet's bottom edge morphs into a
+ * curve and slides up to reveal the page (Olivier Larose SVG-curve reveal).
+ * The hero begins its entrance on the `preloader:done` window event.
  */
 export default function Preloader() {
   const t = useTranslations("misc");
-  const ref = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const pathRef = useRef<SVGPathElement>(null);
   const [done, setDone] = useState(false);
 
   useGSAP(
     () => {
       document.body.style.overflow = "hidden";
 
-      const finish = () => {
+      const cleanup = () => {
         document.body.style.removeProperty("overflow");
-        window.dispatchEvent(new Event("preloader:done"));
         setDone(true);
       };
+      const dispatchDone = () => window.dispatchEvent(new Event("preloader:done"));
 
       const mm = gsap.matchMedia();
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         gsap
-          .timeline({ defaults: { ease: "power3.out" }, onComplete: finish })
-          // Pattern band breathes in behind the emblem
-          .from("[data-loader-pattern]", { autoAlpha: 0, duration: 1.2, ease: "power2.out" })
-          // Emblem rises into place
-          .from(
-            "[data-loader-emblem]",
-            { autoAlpha: 0, y: 36, scale: 0.94, duration: 1.1 },
-            "-=0.9",
-          )
+          .timeline({ defaults: { ease: "power3.out" }, onComplete: cleanup })
+          // Cross rises into place
+          .from("[data-loader-emblem]", { autoAlpha: 0, scale: 0.9, y: 26, duration: 1.0 })
           // Hairline draws underneath like an ink stroke
           .fromTo(
             "[data-loader-line]",
             { scaleX: 0 },
-            { scaleX: 1, duration: 1.2, ease: "power2.inOut" },
+            { scaleX: 1, transformOrigin: "center", duration: 0.9, ease: "power2.inOut" },
             "-=0.5",
           )
-          // Exit: emblem drifts up and the whole sheet lifts away
+          // Hold, then the emblem drifts up and fades
+          .to(["[data-loader-emblem]", "[data-loader-line]"], { autoAlpha: 0, y: -28, duration: 0.5, ease: "power2.in" }, "+=0.35")
+          // The bottom edge curves…
+          .to(pathRef.current, { attr: { d: CURVED }, duration: 0.65, ease: "power2.in" }, "-=0.15")
+          // …and the whole sheet peels up to reveal the page
           .to(
-            "[data-loader-emblem], [data-loader-line]",
-            { autoAlpha: 0, y: -48, duration: 0.55, ease: "power2.in" },
-            "+=0.3",
-          )
-          .to(
-            ref.current,
-            {
-              yPercent: -100,
-              duration: 1,
-              ease: "power4.inOut",
-              // Let the hero begin its entrance while the sheet lifts
-              onStart: () => window.dispatchEvent(new Event("preloader:done")),
-            },
-            "-=0.25",
+            sheetRef.current,
+            { yPercent: -110, duration: 0.95, ease: "power4.inOut", onStart: dispatchDone },
+            "-=0.4",
           );
       });
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.to(ref.current, { autoAlpha: 0, duration: 0.4, onComplete: finish });
+        gsap.timeline({ onComplete: () => { dispatchDone(); cleanup(); } }).to(rootRef.current, {
+          autoAlpha: 0,
+          duration: 0.4,
+        });
       });
     },
-    { scope: ref },
+    { scope: rootRef },
   );
 
   if (done) return null;
 
   return (
     <div
-      ref={ref}
+      ref={rootRef}
       data-preloader
       role="status"
       aria-label={t("loading")}
-      className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-creamy-100"
+      className="fixed inset-0 z-[100] overflow-hidden bg-brown-500"
     >
-      {/* Same gradient-masked motif band as the hero */}
-      <div
-        data-loader-pattern
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-1/2 h-[430px] -translate-y-1/2 opacity-[0.05] [background-image:url('/Pattern.svg')] [background-size:374px_212px] [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)]"
-      />
-
-      <div className="relative flex flex-col items-center gap-8 px-6">
-        {/* eslint-disable-next-line @next/next/no-img-element -- decorative local SVG, no optimization needed */}
-        <img
-          data-loader-emblem
-          src="/loading.svg"
-          alt=""
-          width={860}
-          height={640}
-          className="w-[min(460px,72vw)]"
-        />
-        <div
-          data-loader-line
+      <div ref={sheetRef} className="absolute inset-0">
+        {/* Brown sheet as an SVG path so its bottom edge can curve on exit */}
+        <svg
           aria-hidden="true"
-          className="h-px w-44 origin-center bg-brown-300/70"
-        />
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          className="absolute inset-0 h-full w-full"
+        >
+          <path ref={pathRef} d={FLAT} fill={BROWN} />
+        </svg>
+
+        {/* Creamy Cross emblem + hairline */}
+        <div className="relative z-10 flex h-full flex-col items-center justify-center gap-8 px-6">
+          <div data-loader-emblem aria-hidden="true" className="size-32 md:size-40" style={CROSS_MASK} />
+          <div data-loader-line aria-hidden="true" className="h-px w-40 origin-center bg-creamy-100/40" />
+        </div>
       </div>
     </div>
   );
