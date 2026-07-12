@@ -7,6 +7,34 @@ import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(useGSAP);
 
+const CREAM = "#FEF6F0"; // page-cream — emblem, hairline, pattern
+
+// loading.svg rendered in cream via mask (preserves its shapes and text holes).
+const EMBLEM: React.CSSProperties = {
+  backgroundColor: CREAM,
+  WebkitMaskImage: "url(/loading.svg)",
+  maskImage: "url(/loading.svg)",
+  WebkitMaskRepeat: "no-repeat",
+  maskRepeat: "no-repeat",
+  WebkitMaskPosition: "center",
+  maskPosition: "center",
+  WebkitMaskSize: "contain",
+  maskSize: "contain",
+};
+
+// Cream motif band: Pattern.svg tiled, intersected with a vertical fade.
+const PATTERN: React.CSSProperties = {
+  backgroundColor: CREAM,
+  WebkitMaskImage: "url(/Pattern.svg), linear-gradient(to bottom, transparent, #000 25%, #000 75%, transparent)",
+  maskImage: "url(/Pattern.svg), linear-gradient(to bottom, transparent, #000 25%, #000 75%, transparent)",
+  WebkitMaskRepeat: "repeat, no-repeat",
+  maskRepeat: "repeat, no-repeat",
+  WebkitMaskSize: "374px 212px, 100% 100%",
+  maskSize: "374px 212px, 100% 100%",
+  WebkitMaskComposite: "source-in",
+  maskComposite: "intersect",
+};
+
 // Cross.svg used as an *inverted* mask: the sheet is everything EXCEPT the
 // cross, so growing the cross opens a cross-shaped hole that reveals the page.
 const CROSS_REVEAL: React.CSSProperties = {
@@ -100,30 +128,24 @@ export default function Preloader() {
       data-preloader
       role="status"
       aria-label={t("loading")}
-      className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-creamy-100"
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-brown-500"
       style={CROSS_REVEAL}
     >
-      {/* Same gradient-masked motif band as the hero */}
+      {/* Cream motif band */}
       <div
         data-loader-pattern
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-1/2 h-[430px] -translate-y-1/2 opacity-[0.05] [background-image:url('/Pattern.svg')] [background-size:374px_212px] [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)]"
+        className="pointer-events-none absolute inset-x-0 top-1/2 h-[430px] -translate-y-1/2 opacity-[0.08]"
+        style={PATTERN}
       />
 
       <div className="relative flex flex-col items-center gap-8 px-6">
-        {/* eslint-disable-next-line @next/next/no-img-element -- decorative local SVG, no optimization needed */}
-        <img
-          data-loader-emblem
-          src="/loading.svg"
-          alt=""
-          width={860}
-          height={640}
-          className="w-[min(460px,72vw)]"
-        />
+        {/* Cream loading emblem (loading.svg via mask) */}
+        <div data-loader-emblem aria-hidden="true" className="aspect-[860/640] w-[min(460px,72vw)]" style={EMBLEM} />
         <div
           data-loader-line
           aria-hidden="true"
-          className="h-px w-44 origin-center bg-brown-300/70"
+          className="h-px w-44 origin-center bg-creamy-100/40"
         />
       </div>
     </div>
