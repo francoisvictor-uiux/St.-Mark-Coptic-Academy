@@ -38,28 +38,63 @@ export default function Theses({ items: itemsProp, labels }: { items?: ThesisIte
       const container = containerRef.current;
       const mask = maskRef.current;
       if (!container || !mask) return;
-      const xTo = gsap.quickTo(mask, "--x", { duration: 0.55, ease: "power3.out" });
-      const yTo = gsap.quickTo(mask, "--y", { duration: 0.55, ease: "power3.out" });
+
+      // quickTo can't reliably animate CSS custom properties, so LERP the mask
+      // centre by hand on GSAP's ticker and write the vars with setProperty.
+      let tx = -9999;
+      let ty = -9999;
+      let cx = -9999;
+      let cy = -9999;
+      let running = false;
+      const paint = () => {
+        mask.style.setProperty("--x", `${cx}`);
+        mask.style.setProperty("--y", `${cy}`);
+      };
+      const tick = () => {
+        cx += (tx - cx) * 0.15;
+        cy += (ty - cy) * 0.15;
+        paint();
+      };
+      const start = () => {
+        if (!running) {
+          running = true;
+          gsap.ticker.add(tick);
+        }
+      };
+      const stop = () => {
+        if (running) {
+          running = false;
+          gsap.ticker.remove(tick);
+        }
+      };
+      const local = (e: PointerEvent): [number, number] => {
+        const r = mask.getBoundingClientRect();
+        return [e.clientX - r.left, e.clientY - r.top];
+      };
 
       const enter = (e: PointerEvent) => {
         if (e.pointerType !== "mouse") return;
-        const r = mask.getBoundingClientRect();
-        xTo(e.clientX - r.left, e.clientX - r.left);
-        yTo(e.clientY - r.top, e.clientY - r.top);
+        const [x, y] = local(e);
+        tx = cx = x;
+        ty = cy = y;
+        paint();
+        start();
         gsap.to(mask, { "--r": RADIUS, duration: 0.5, ease: "power2.out", overwrite: true });
       };
       const move = (e: PointerEvent) => {
         if (e.pointerType !== "mouse") return;
-        const r = mask.getBoundingClientRect();
-        xTo(e.clientX - r.left);
-        yTo(e.clientY - r.top);
+        [tx, ty] = local(e);
       };
-      const leave = () => gsap.to(mask, { "--r": 0, duration: 0.5, ease: "power2.out", overwrite: true });
+      const leave = () => {
+        stop();
+        gsap.to(mask, { "--r": 0, duration: 0.5, ease: "power2.out", overwrite: true });
+      };
 
       container.addEventListener("pointerenter", enter);
       container.addEventListener("pointermove", move);
       container.addEventListener("pointerleave", leave);
       return () => {
+        stop();
         container.removeEventListener("pointerenter", enter);
         container.removeEventListener("pointermove", move);
         container.removeEventListener("pointerleave", leave);
