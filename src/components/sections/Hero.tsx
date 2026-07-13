@@ -50,11 +50,14 @@ export default function Hero({ overrides }: { overrides?: { eyebrow?: string; ti
           )
           .from("[data-hero-subtitle]", { autoAlpha: 0, y: 24, duration: 0.8 }, "-=0.6")
           .from("[data-hero-cta]", { autoAlpha: 0, y: 24, duration: 0.7, stagger: 0.12 }, "-=0.5")
-          // Transform-only slide (no opacity) — fading a large, decoding video
-          // via autoAlpha every frame was the main entrance jank.
+          // Gentle zoom-settle (transform only — still no opacity, which was
+          // the original jank). Deliberately NOT a vertical slide: the video is
+          // tucked under the headline with a big negative margin, so a yPercent
+          // rise made its top edge lift up and clip. A centred scale settles it
+          // into place without any vertical shift.
           .from(
             "[data-hero-image]",
-            { yPercent: 12, duration: 1.0, ease: "power2.out" },
+            { scale: 1.06, duration: 1.1, ease: "power2.out", transformOrigin: "50% 50%" },
             "-=0.55",
           );
 
@@ -90,6 +93,7 @@ export default function Hero({ overrides }: { overrides?: { eyebrow?: string; ti
         yPercent: 14,
         scale: 1.08,
         ease: "none",
+        immediateRender: false, // never apply the drifted end-state before scroll
         scrollTrigger: parallax,
       });
     },
