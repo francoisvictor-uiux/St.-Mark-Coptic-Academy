@@ -8,8 +8,6 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(useGSAP);
 
 const CREAM = "#FEF6F0"; // page-cream — the emblem colour
-const BROWN = "#562823"; // --color-brown-500 — the curtain colour
-const CURVE = 180; // depth of the curved bottom edge, in px
 
 // loading.svg rendered in cream via mask (preserves its shapes and text holes).
 // Starts hidden so there's no first-paint flash before GSAP fades it in.
@@ -26,20 +24,41 @@ const EMBLEM: React.CSSProperties = {
   maskSize: "contain",
 };
 
+// Brown sheet with a cross-shaped HOLE punched out of it (Cross.svg used as an
+// *inverted* mask via xor/exclude: the sheet is everything EXCEPT the cross).
+//
+// The key difference from the old, laggy version: the cross mask size is FIXED.
+// The reveal is done by animating `transform: scale()` on this element, NOT by
+// animating `mask-size`. CSS applies the mask first and the transform after, so
+// the browser rasterizes the cross once and then scales that texture on the GPU
+// — no per-frame mask re-rasterization, which is what caused the stutter.
+const CROSS_SIZE = "clamp(140px, 34vw, 360px)";
+const CROSS_REVEAL: React.CSSProperties = {
+  WebkitMaskImage: "url(/Cross.svg), linear-gradient(#000, #000)",
+  maskImage: "url(/Cross.svg), linear-gradient(#000, #000)",
+  WebkitMaskRepeat: "no-repeat, no-repeat",
+  maskRepeat: "no-repeat, no-repeat",
+  WebkitMaskPosition: "center, center",
+  maskPosition: "center, center",
+  WebkitMaskSize: `${CROSS_SIZE}, cover`,
+  maskSize: `${CROSS_SIZE}, cover`,
+  WebkitMaskComposite: "xor",
+  maskComposite: "exclude",
+  willChange: "transform",
+};
+
 /**
  * Full-screen intro overlay shown on every hard page load. The hero pauses its
  * entrance while `[data-preloader]` is in the DOM and resumes on the
  * `preloader:done` window event.
  *
- * On exit the whole sheet slides up while a single SVG `<path>` flattens its
- * curved bottom edge — the classic curved-curtain wipe. Only the path's `d`
- * and one transform animate, so there's no per-frame mask re-rasterization
- * (the old Cross.svg mask-size + scale reveal was the source of the lag).
+ * On exit the emblem fades and a cross-shaped hole grows to reveal the page.
+ * The growth is a pure `transform: scale()` on the pre-masked sheet (see
+ * CROSS_REVEAL) so it stays on the compositor and doesn't re-raster the mask.
  */
 export default function Preloader() {
   const t = useTranslations("misc");
-  const root = useRef<HTMLDivElement>(null);
-  const pathRef = useRef<SVGPathElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const [done, setDone] = useState(false);
 
   useGSAP(
@@ -51,34 +70,6 @@ export default function Preloader() {
         setDone(true);
       };
 
-      // Track the live curve depth so a mid-load resize can redraw correctly.
-      const state = { curve: CURVE };
-
-      const draw = () => {
-        const el = root.current;
-        const path = pathRef.current;
-        if (!el || !path) return;
-        const w = window.innerWidth;
-        const h = el.getBoundingClientRect().height;
-        // Rectangle with a quadratic-curved bottom edge that rises `curve` px
-        // toward the middle. curve = CURVE → covers the viewport; curve = 0 → flat.
-        path.setAttribute(
-          "d",
-          `M0 0 L${w} 0 L${w} ${h} Q${w / 2} ${h - state.curve} 0 ${h} L0 0`,
-        );
-      };
-
-      draw();
-      const onResize = () => draw();
-      window.addEventListener("resize", onResize);
-
-      const started = { done: false };
-      const releaseHero = () => {
-        if (started.done) return;
-        started.done = true;
-        window.dispatchEvent(new Event("preloader:done"));
-      };
-
       const mm = gsap.matchMedia();
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
@@ -88,62 +79,48 @@ export default function Preloader() {
           // Emblem fades in (opacity only — no mask re-raster).
           .to("[data-loader-emblem]", { autoAlpha: 1, duration: 0.5 })
           .addLabel("exit", "+=0.2")
-          // Let the hero begin its entrance as the curtain starts lifting.
-          .add(releaseHero, "exit")
+          // Fade the emblem out as the reveal begins.
+          .to("[data-loader-emblem]", { autoAlpha: 0, duration: 0.3, ease: "power2.in" }, "exit")
+          // Grow the cross-shaped hole by scaling the sheet — transform only, so
+          // the GPU scales the already-rasterized mask (smooth). Scale is large
+          // enough for the hole to clear the viewport on wide screens.
           .to(
-            "[data-loader-emblem]",
-            { autoAlpha: 0, duration: 0.3, ease: "power2.in" },
-            "exit",
-          )
-          // Flatten the curved edge and slide the whole sheet up — one coherent
-          // wipe. Transform + a single path redraw = compositor-friendly.
-          .to(
-            state,
-            { curve: 0, duration: 0.9, ease: "power2.inOut", onUpdate: draw },
-            "exit",
-          )
-          .to(
-            root.current,
-            { yPercent: -100, duration: 0.9, ease: "power2.inOut" },
+            ref.current,
+            {
+              scale: 9,
+              duration: 0.85,
+              ease: "power2.in",
+              transformOrigin: "50% 50%",
+              // Let the hero begin its entrance while the cross opens.
+              onStart: () => window.dispatchEvent(new Event("preloader:done")),
+            },
             "exit",
           );
       });
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
         gsap.set("[data-loader-emblem]", { autoAlpha: 1 });
-        releaseHero();
-        gsap.to(root.current, { autoAlpha: 0, duration: 0.4, onComplete: finish });
+        window.dispatchEvent(new Event("preloader:done"));
+        gsap.to(ref.current, { autoAlpha: 0, duration: 0.4, onComplete: finish });
       });
-
-      return () => window.removeEventListener("resize", onResize);
     },
-    { scope: root },
+    { scope: ref },
   );
 
   if (done) return null;
 
   return (
     <div
-      ref={root}
+      ref={ref}
       data-preloader
       role="status"
       aria-label={t("loading")}
-      className="fixed left-0 top-0 z-[100] w-screen will-change-transform"
-      style={{ height: `calc(100vh + ${CURVE}px)` }}
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-brown-500"
+      style={CROSS_REVEAL}
     >
-      {/* The curtain itself: a single filled path whose bottom edge curves. */}
-      <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="none" aria-hidden="true">
-        <path ref={pathRef} style={{ fill: BROWN }} />
-      </svg>
-
-      {/* Cream loading emblem centred in the viewport (not the taller sheet). */}
-      <div className="relative flex h-screen items-center justify-center px-6">
-        <div
-          data-loader-emblem
-          aria-hidden="true"
-          className="aspect-[860/640] w-[min(460px,72vw)]"
-          style={EMBLEM}
-        />
+      <div className="relative flex flex-col items-center px-6">
+        {/* Cream loading emblem (loading.svg via mask) */}
+        <div data-loader-emblem aria-hidden="true" className="aspect-[860/640] w-[min(460px,72vw)]" style={EMBLEM} />
       </div>
     </div>
   );
