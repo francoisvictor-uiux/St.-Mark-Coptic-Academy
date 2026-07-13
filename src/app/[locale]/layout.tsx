@@ -6,7 +6,6 @@ import { routing } from "@/i18n/routing";
 import { AuthProvider } from "@/lib/auth-context";
 import Preloader from "@/components/layout/Preloader";
 import ScrollToTop from "@/components/layout/ScrollToTop";
-import SmoothScroll from "@/components/layout/SmoothScroll";
 import {
   thmanyahSans,
   thmanyahSerifText,
@@ -57,7 +56,6 @@ export default async function LocaleLayout({
       <body className="min-h-screen">
         <NextIntlClientProvider>
           <AuthProvider>
-            <SmoothScroll />
             <ScrollToTop />
             <Preloader />
             {children}

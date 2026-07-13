@@ -19,13 +19,7 @@ export default function ScrollToTop() {
     if (window.location.hash) return;
 
     // Instant jump — a smooth scroll on every navigation feels sluggish.
-    // Prefer Lenis (it owns the scroll position) and fall back to the window.
-    const lenis = globalThis.__lenis;
-    if (lenis) {
-      lenis.scrollTo(0, { immediate: true, force: true });
-    } else {
-      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-    }
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [pathname]);
 
   return null;
