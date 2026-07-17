@@ -30,12 +30,12 @@ const RADIUS = 200; // px radius of the cursor reveal circle
 // collapsed and overlapping.
 const PATTERN_SRC = "url(/Pattern-logo.svg)";
 
-// One cell = one logo + its padding. Square on purpose: equal value on both axes
-// is what keeps the spacing identical horizontally and vertically. Both axes are
-// pinned (never height:auto — SVG backgrounds resolve `auto` unpredictably and
-// squash the tile). At 100px the logo renders 50px with a 50px gap around it;
-// scale both numbers together to make the motif bigger or airier.
-const PATTERN_TILE = "100px 100px";
+// One cell = one 50px logo + a 2px pad each side, i.e. a 4px gap to each
+// neighbour — a compact, intact grid. Square on purpose: an equal value on both
+// axes is what keeps the horizontal and vertical spacing identical. Both axes
+// are pinned (never height:auto — SVG backgrounds resolve `auto` unpredictably
+// and squash the tile). Must match the cell size baked into Pattern-logo.svg.
+const PATTERN_TILE = "54px 54px";
 
 // Rises out of the very bottom of the band and dissolves quickly, so the
 // pattern stays a whisper and never reaches the heading.

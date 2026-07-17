@@ -9,7 +9,20 @@ gsap.registerPlugin(useGSAP);
 
 const CREAM = "#FEF6F0"; // page-cream — the emblem colour
 const BROWN = "#562823"; // --color-brown-500 — the curtain colour
-const CURVE = 180; // depth of the curved bottom edge, in px
+
+// The curtain is drawn in a normalised 0-100 viewBox (preserveAspectRatio="none"
+// stretches it to fill the sheet). That's deliberate: the shape needs no
+// measuring, so the real `d` is rendered on the SERVER and the curtain is opaque
+// on the very first paint. Previously `d` was computed from window.innerWidth in
+// an effect, so the SSR'd path was empty — the page flashed through the
+// "invisible" preloader until JS hydrated and drew it.
+const CURVE = 16; // bulge of the bottom edge, in viewBox units
+const SHEET = "124vh"; // taller than the viewport so the curve can't reveal the page early
+
+// Rectangle with a quadratic-curved bottom edge that rises `curve` toward the
+// middle. At CURVE the mid-point sits at (1 - 16/100) * 124vh = 104vh — still
+// below the fold on ANY viewport height, since it's all in vh. curve 0 = flat.
+const curvePath = (curve: number) => `M0 0 L100 0 L100 100 Q50 ${100 - curve} 0 100 L0 0`;
 
 // loading.svg rendered in cream via mask. A *static* mask is cheap: it's
 // rasterized once and then only opacity animates (GPU-composited). Animating
@@ -52,24 +65,10 @@ export default function Preloader() {
         setDone(true);
       };
 
-      // Track the live curve depth so a mid-load resize can redraw correctly.
+      // Normalised coords, so the sheet rescales itself on resize — no measuring,
+      // no redraw listener. The path already carries its server-rendered shape.
       const state = { curve: CURVE };
-
-      const draw = () => {
-        const el = root.current;
-        const path = pathRef.current;
-        if (!el || !path) return;
-        const w = window.innerWidth;
-        const h = el.getBoundingClientRect().height;
-        path.setAttribute(
-          "d",
-          `M0 0 L${w} 0 L${w} ${h} Q${w / 2} ${h - state.curve} 0 ${h} L0 0`,
-        );
-      };
-
-      draw();
-      const onResize = () => draw();
-      window.addEventListener("resize", onResize);
+      const draw = () => pathRef.current?.setAttribute("d", curvePath(state.curve));
 
       const started = { done: false };
       const releaseHero = () => {
@@ -107,8 +106,6 @@ export default function Preloader() {
         releaseHero();
         gsap.to(root.current, { autoAlpha: 0, duration: 0.4, onComplete: finish });
       });
-
-      return () => window.removeEventListener("resize", onResize);
     },
     { scope: root },
   );
@@ -122,11 +119,18 @@ export default function Preloader() {
       role="status"
       aria-label={t("loading")}
       className="fixed left-0 top-0 z-[100] w-screen will-change-transform"
-      style={{ height: `calc(100vh + ${CURVE}px)` }}
+      style={{ height: SHEET }}
     >
-      {/* The curtain: a single filled path whose bottom edge curves. */}
-      <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="none" aria-hidden="true">
-        <path ref={pathRef} style={{ fill: BROWN }} />
+      {/* The curtain: a single filled path whose bottom edge curves. `d` is
+          rendered here (not in an effect) so the sheet is opaque on the first
+          paint — otherwise the page shows through until JS hydrates. */}
+      <svg
+        className="absolute inset-0 h-full w-full"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path ref={pathRef} d={curvePath(CURVE)} style={{ fill: BROWN }} />
       </svg>
 
       {/* Cream loading emblem centred in the viewport (not the taller sheet). */}
