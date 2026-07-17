@@ -167,7 +167,7 @@ export default function Hero({ overrides }: { overrides?: { eyebrow?: string; ti
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-b from-creamy-100 from-[8%] via-creamy-100/10 via-[24%] to-creamy-100/0"
+          className="absolute inset-0 bg-gradient-to-b from-creamy-100 from-[28%] via-creamy-100/20 via-[52%] to-creamy-100/0"
         />
       </div>
     </section>
