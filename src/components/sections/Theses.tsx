@@ -20,19 +20,22 @@ type ThesisItem = {
 
 const RADIUS = 200; // px radius of the cursor reveal circle
 
-// Pattern-cream.svg is Pattern.svg recoloured: the logo shapes are creamy and
-// the white inner detail is knocked out to transparent, so the band colour
-// shows through it. It is deliberately NOT used as a mask — a mask flattens the
-// alpha of both tones together, which fuses every logo into a solid blob and
-// makes the units read as collapsed/overlapping.
-const PATTERN_SRC = "url(/Pattern-cream.svg)";
+// Pattern-logo.svg is generated from the main Logo.svg (see the header comment
+// in that file): a single creamy 50x50 logo centred in a SQUARE 100x100 cell.
+// Because the cell is square and the logo is centred, tiling it produces exactly
+// equal horizontal and vertical gaps with every logo on a clean grid.
+//
+// It is deliberately used as a background-image, NOT a mask — a mask flattens
+// alpha, which fused each logo into a solid blob and made the units read as
+// collapsed and overlapping.
+const PATTERN_SRC = "url(/Pattern-logo.svg)";
 
-// The tile is one full 374x212 block of the logo grid. Both axes are pinned
-// (never height:auto — SVG backgrounds resolve `auto` unpredictably and squash
-// the tile, which is what overlapped the units), scaled up 1.25x so each logo
-// sits further from its neighbours. Keep the 374:212 ratio when tuning or the
-// horizontal and vertical spacing stop matching.
-const PATTERN_TILE = "468px 265px";
+// One cell = one logo + its padding. Square on purpose: equal value on both axes
+// is what keeps the spacing identical horizontally and vertically. Both axes are
+// pinned (never height:auto — SVG backgrounds resolve `auto` unpredictably and
+// squash the tile). At 100px the logo renders 50px with a 50px gap around it;
+// scale both numbers together to make the motif bigger or airier.
+const PATTERN_TILE = "100px 100px";
 
 // Rises out of the very bottom of the band and dissolves quickly, so the
 // pattern stays a whisper and never reaches the heading.

@@ -119,7 +119,13 @@ export default function Header() {
               href={item.href}
               aria-current={isActive(item.href) ? "page" : undefined}
               data-active={isActive(item.href) ? "true" : undefined}
-              className="font-serif text-[16px] text-brown-400 transition-colors hover:text-brown-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brown-500 data-active:font-bold data-active:text-brown-500"
+              // Mirrored into a hidden ::before below to reserve the bold width.
+              data-text={t(item.key)}
+              // The ::before renders the same label already bold, invisible and
+              // zero-height, so the link is always as wide as its bold state.
+              // Without it, bolding on hover would widen the tab and shove the
+              // rest of the nav sideways on every pointer move.
+              className="flex flex-col items-center font-serif text-[16px] text-brown-400 transition-colors before:invisible before:block before:h-0 before:overflow-hidden before:font-bold before:content-[attr(data-text)] hover:font-bold hover:text-brown-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brown-500 data-active:font-bold data-active:text-brown-500"
             >
               {t(item.key)}
             </Link>
@@ -221,7 +227,7 @@ export default function Header() {
                   onClick={closeMenu}
                   aria-current={isActive(item.href) ? "page" : undefined}
                   data-active={isActive(item.href) ? "true" : undefined}
-                  className="rounded-2xl px-4 py-3 font-serif text-lg text-brown-500 transition-colors hover:bg-brown-500/5 data-active:bg-brown-500/10 data-active:font-bold"
+                  className="rounded-2xl px-4 py-3 font-serif text-lg text-brown-500 transition-colors hover:bg-brown-500/5 hover:font-bold data-active:bg-brown-500/10 data-active:font-bold"
                 >
                   {t(item.key)}
                 </Link>
