@@ -20,12 +20,36 @@ type ThesisItem = {
 
 const RADIUS = 200; // px radius of the cursor reveal circle
 
-// Pattern.svg is tiled at its NATIVE 374x212 (width-only background-size keeps
-// the height auto, so it can never stretch or collapse). It's faded in from the
-// bottom of the band via a mask so it dissolves before it reaches the heading.
-const PATTERN_TILE = "374px";
+const CREAM = "#FEF6F0"; // creamy-100 — the pattern colour on both bands
+
+// Pattern.svg tiled at its EXPLICIT native size. Both axes are pinned (rather
+// than height:auto, which SVG backgrounds can resolve unpredictably and squash)
+// so every tile is identical and the repeat grid stays evenly spaced in both
+// directions — no collapsing or overlapping motifs.
+const PATTERN_TILE = "374px 212px";
+
+// Rises out of the bottom of the band and dissolves before reaching the heading.
 const PATTERN_FADE =
   "linear-gradient(to top, #000 0%, rgba(0,0,0,0.55) 32%, transparent 72%)";
+
+// The SVG's own fills are hardcoded (#562823 / #fff), so it's used as a MASK
+// over a creamy fill instead — that way the pattern is creamy on the brown base
+// AND the pink hover copy. Layer 1 = the tiled pattern, layer 2 = the fade;
+// compositing them with `intersect` shows the pattern only where the fade is.
+const PATTERN_STYLE = (dark: boolean): React.CSSProperties => ({
+  backgroundColor: CREAM,
+  opacity: dark ? 0.16 : 0.14,
+  WebkitMaskImage: `url(/Pattern.svg), ${PATTERN_FADE}`,
+  maskImage: `url(/Pattern.svg), ${PATTERN_FADE}`,
+  WebkitMaskRepeat: "repeat, no-repeat",
+  maskRepeat: "repeat, no-repeat",
+  WebkitMaskSize: `${PATTERN_TILE}, cover`,
+  maskSize: `${PATTERN_TILE}, cover`,
+  WebkitMaskPosition: "top left, center",
+  maskPosition: "top left, center",
+  WebkitMaskComposite: "source-in",
+  maskComposite: "intersect",
+});
 
 export default function Theses({ items: itemsProp, labels }: { items?: ThesisItem[]; labels?: { label?: string; subtitle?: string } }) {
   const t = useTranslations("theses");
@@ -117,21 +141,10 @@ export default function Theses({ items: itemsProp, labels }: { items?: ThesisIte
         dark ? "bg-[#D46A6B]" : "bg-brown-500"
       }`}
     >
-      {/* Coptic pattern wash, rising out of the bottom of the band. Absolutely
-          positioned behind the content (which is `relative`), so it can never
-          overlap the text. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage: "url(/Pattern.svg)",
-          backgroundRepeat: "repeat",
-          backgroundSize: PATTERN_TILE,
-          opacity: dark ? 0.14 : 0.16,
-          WebkitMaskImage: PATTERN_FADE,
-          maskImage: PATTERN_FADE,
-        }}
-      />
+      {/* Creamy Coptic pattern wash, rising out of the bottom of the band.
+          Absolutely positioned behind the content (which is `relative`), so it
+          can never overlap the text. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={PATTERN_STYLE(dark)} />
 
       <div
         className={`relative mx-auto flex max-w-[1248px] flex-col gap-10 md:gap-14 ${
